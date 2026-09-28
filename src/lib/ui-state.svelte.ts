@@ -1,11 +1,12 @@
-// UI 표시 상태만 담는다. 노트 데이터는 상태가 아니라 mock/data.ts의 상수다.
+// UI 표시 상태만 담는다. 노트 데이터 상태는 notes.svelte.ts에 있다.
 
 export type SaveStatus = 'saved' | 'saving' | 'unsaved'
 export type EditorTab = 'edit' | 'preview'
 
 type Forced = {
   searchEmpty: boolean
-  save: SaveStatus
+  // null이면 강제하지 않음 — 노트의 편집 여부로 저장 상태를 정한다
+  save: SaveStatus | null
   folderEmpty: boolean
 }
 
@@ -19,7 +20,7 @@ function readForced(): Forced {
   const save = params.get('save')
   return {
     searchEmpty: params.get('search') === 'empty',
-    save: save === 'saving' || save === 'unsaved' ? save : 'saved',
+    save: save === 'saving' || save === 'unsaved' ? save : null,
     folderEmpty: params.get('folder') === 'empty',
   }
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { EMPTY_FOLDER_ID, folders, notes, tags } from '../mock/data'
+  import { EMPTY_FOLDER_ID, folders, tags } from '../mock/data'
+  import { notes } from '../notes.svelte'
   import { forced, ui } from '../ui-state.svelte'
   import Icon from '../components/Icon.svelte'
   import PrimaryButton from '../components/PrimaryButton.svelte'

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { EMPTY_FOLDER_ID, folderById, notes } from '../mock/data'
+  import { EMPTY_FOLDER_ID, folderById } from '../mock/data'
+  import { notes } from '../notes.svelte'
   import { FORCED_SEARCH_QUERY, forced, ui } from '../ui-state.svelte'
   import EmptyState from '../components/EmptyState.svelte'
   import Icon from '../components/Icon.svelte'

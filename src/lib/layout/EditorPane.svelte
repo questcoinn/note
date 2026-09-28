@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { notes } from '../mock/data'
+  import { noteById } from '../notes.svelte'
   import { forced, ui, type EditorTab } from '../ui-state.svelte'
   import ConfirmDialog from '../components/ConfirmDialog.svelte'
   import EmptyState from '../components/EmptyState.svelte'
@@ -8,7 +8,9 @@
   import PrimaryButton from '../components/PrimaryButton.svelte'
   import SaveStatusIndicator from '../components/SaveStatusIndicator.svelte'
 
-  const note = $derived(notes.find((item) => item.id === ui.selectedNoteId))
+  const note = $derived(ui.selectedNoteId ? noteById.get(ui.selectedNoteId) : undefined)
+  // URL 강제 상태가 우선하고, 없으면 이번 세션의 편집 여부로 정한다
+  const saveStatus = $derived(forced.save ?? (note?.dirty ? 'unsaved' : 'saved'))
   const tabId = $props.id()
 
   const tabs: { id: EditorTab; label: string }[] = [
@@ -32,7 +34,7 @@
       <button type="button" class="icon-button back" aria-label="목록으로" onclick={() => (ui.selectedNoteId = null)}>
         <Icon name="arrow-left" />
       </button>
-      <SaveStatusIndicator status={forced.save} />
+      <SaveStatusIndicator status={saveStatus} />
       <button type="button" class="icon-button delete" aria-label="노트 삭제" onclick={() => (ui.deleteDialogOpen = true)}>
         <Icon name="trash" />
       </button>
@@ -63,14 +65,17 @@
     <div class="panes" data-tab={ui.editorTab}>
       <div id="{tabId}-edit" class="pane source-pane" role="tabpanel" aria-labelledby="{tabId}-edit-tab">
         <label class="visually-hidden" for="{tabId}-source">마크다운 원문</label>
-        <!-- 뼈대 단계: 입력해도 미리보기·목록·저장 상태가 바뀌지 않는다. 노트가 바뀌면 원문을 다시 채운다 -->
-        {#key note.id}
-          <textarea id="{tabId}-source" class="source" spellcheck="false" value={note.source}></textarea>
-        {/key}
+        <textarea
+          id="{tabId}-source"
+          class="source"
+          spellcheck="false"
+          bind:value={note.source}
+          oninput={() => note && (note.dirty = true)}
+        ></textarea>
       </div>
-      <!-- previewHtml은 저장소에 고정된 목업 문자열이다. 사용자 입력을 렌더링할 때는 반드시 sanitize할 것 -->
+      <!-- note.html은 사용자 입력에서 만들어지지만 markdown/render.ts에서 DOMPurify로 정화된 값이다. 정화를 거치지 않은 HTML을 여기에 넣지 말 것 -->
       <div id="{tabId}-preview" class="pane preview" role="tabpanel" aria-labelledby="{tabId}-preview-tab">
-        {@html note.previewHtml}
+        {@html note.html}
       </div>
     </div>
 
@@ -287,6 +292,86 @@
   .preview :global(blockquote) {
     padding-left: var(--spacing-lg);
     border-left: 3px solid var(--color-border);
+  }
+
+  .preview :global(strong) {
+    color: var(--color-foreground);
+    font-weight: 700;
+  }
+
+  /* 취소선도 본문이므로 muted로 흐리게 하지 않고 4.5:1을 유지한다 */
+  .preview :global(s),
+  .preview :global(del) {
+    color: var(--color-body);
+  }
+
+  /* DESIGN.md에 h5/h6 역할이 없어 body / body-small 역할을 굵게 재사용한다 */
+  .preview :global(h5) {
+    color: var(--color-foreground);
+    font-size: var(--type-body-size);
+    font-weight: 600;
+    line-height: var(--type-body-line);
+  }
+
+  .preview :global(h6) {
+    color: var(--color-foreground);
+    font-size: var(--type-body-small-size);
+    font-weight: 600;
+    line-height: var(--type-body-small-line);
+  }
+
+  .preview :global(hr) {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .preview :global(.table-scroll) {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .preview :global(table) {
+    border-collapse: collapse;
+    font-size: var(--type-body-small-size);
+    line-height: var(--type-body-small-line);
+  }
+
+  .preview :global(th),
+  .preview :global(td) {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 1px solid var(--color-border);
+    text-align: left;
+    /* .preview의 overflow-wrap: anywhere가 열을 한 글자 폭까지 줄이므로, 표에서는 어절 단위로만 줄바꿈하고 넘치면 가로 스크롤한다 */
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+
+  .preview :global(th) {
+    background: var(--color-surface);
+    color: var(--color-foreground);
+    font-weight: 600;
+  }
+
+  .preview :global(li.task) {
+    list-style: none;
+  }
+
+  .preview :global(li.task input) {
+    margin: 0 var(--spacing-md) 0 0;
+    accent-color: var(--color-primary);
+    vertical-align: -2px;
+  }
+
+  /* inline-block이라 위의 * + * 문단 간격이 걸리지 않게 여백을 지운다 */
+  .preview :global(.image-alt) {
+    display: inline-block;
+    margin: 0;
+    padding: 0 var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-body);
+    font-size: var(--type-body-small-size);
+    line-height: var(--type-body-small-line);
   }
 
   /* 1024px 미만: 편집/미리보기 탭 (design.md D7) */

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { Note } from '../mock/data'
   import { tagById } from '../mock/data'
+  import type { NoteDoc } from '../notes.svelte'
   import TagChip from './TagChip.svelte'
 
   let {
@@ -8,7 +8,7 @@
     selected = false,
     onselect,
   }: {
-    note: Note
+    note: NoteDoc
     selected?: boolean
     onselect: () => void
   } = $props()
@@ -21,7 +21,9 @@
       {note.title}
     </button>
   </h3>
-  <p class="snippet">{note.snippet}</p>
+  {#if note.snippet}
+    <p class="snippet">{note.snippet}</p>
+  {/if}
   <div class="meta">
     <span class="timestamp">{note.updatedLabel}</span>
     {#if note.tagIds.length > 0}
