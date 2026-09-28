@@ -1,7 +1,7 @@
 <script lang="ts">
   import { EMPTY_FOLDER_ID, folderById } from '../mock/data'
-  import { notes } from '../notes.svelte'
-  import { FORCED_SEARCH_QUERY, forced, ui } from '../ui-state.svelte'
+  import { notes, type NoteDoc } from '../notes.svelte'
+  import { FORCED_SEARCH_QUERY, forced, selectNote, ui } from '../ui-state.svelte'
   import EmptyState from '../components/EmptyState.svelte'
   import Icon from '../components/Icon.svelte'
   import NoteCard from '../components/NoteCard.svelte'
@@ -14,6 +14,13 @@
   const showFolderEmpty = forced.folderEmpty && !forced.searchEmpty
   const emptyFolderName = folderById.get(EMPTY_FOLDER_ID)?.name ?? ''
   const scopeTitle = showFolderEmpty ? emptyFolderName : '전체 노트'
+
+  // 최근 수정 순. 선택된 노트만 선택한 순간의 수정 시각으로 정렬해, 편집하는 동안 제자리에 둔다 (design.md D6)
+  const sortKey = (note: NoteDoc) =>
+    note.id === ui.selectedNoteId && ui.pinnedSortKey !== null ? ui.pinnedSortKey : note.updatedAt
+  const sortedNotes = $derived(
+    notes.toSorted((a, b) => sortKey(b).localeCompare(sortKey(a)) || a.id.localeCompare(b.id)),
+  )
 </script>
 
 <section class="note-list" aria-labelledby="note-list-title">
@@ -52,9 +59,9 @@
     </EmptyState>
   {:else}
     <ul class="cards">
-      {#each notes as note (note.id)}
+      {#each sortedNotes as note (note.id)}
         <li>
-          <NoteCard {note} selected={ui.selectedNoteId === note.id} onselect={() => (ui.selectedNoteId = note.id)} />
+          <NoteCard {note} selected={ui.selectedNoteId === note.id} onselect={() => selectNote(note.id)} />
         </li>
       {/each}
     </ul>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { clock, formatUpdatedLabel } from '../clock.svelte'
   import { tagById } from '../mock/data'
   import type { NoteDoc } from '../notes.svelte'
   import TagChip from './TagChip.svelte'
@@ -25,7 +26,7 @@
     <p class="snippet">{note.snippet}</p>
   {/if}
   <div class="meta">
-    <span class="timestamp">{note.updatedLabel}</span>
+    <span class="timestamp">{formatUpdatedLabel(note.updatedAt, clock.now)}</span>
     {#if note.tagIds.length > 0}
       <ul class="tags" aria-label="태그">
         {#each note.tagIds as tagId (tagId)}

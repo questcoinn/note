@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { noteById } from '../notes.svelte'
-  import { forced, ui, type EditorTab } from '../ui-state.svelte'
+  import { flushNotes, markEdited, noteById, saveStatusOf } from '../notes.svelte'
+  import type { SavePhase } from '../persistence/autosave.svelte'
+  import { selectNote, ui, type EditorTab, type SaveStatus } from '../ui-state.svelte'
   import ConfirmDialog from '../components/ConfirmDialog.svelte'
   import EmptyState from '../components/EmptyState.svelte'
   import Icon from '../components/Icon.svelte'
@@ -8,9 +9,16 @@
   import PrimaryButton from '../components/PrimaryButton.svelte'
   import SaveStatusIndicator from '../components/SaveStatusIndicator.svelte'
 
+  // 저장 대기와 쓰기 진행은 둘 다 "저장 중"으로 보인다 (design.md D8)
+  const statusByPhase: Record<SavePhase, SaveStatus> = {
+    saved: 'saved',
+    pending: 'saving',
+    writing: 'saving',
+    failed: 'unsaved',
+  }
+
   const note = $derived(ui.selectedNoteId ? noteById.get(ui.selectedNoteId) : undefined)
-  // URL 강제 상태가 우선하고, 없으면 이번 세션의 편집 여부로 정한다
-  const saveStatus = $derived(forced.save ?? (note?.dirty ? 'unsaved' : 'saved'))
+  const saveStatus = $derived(note ? statusByPhase[saveStatusOf(note.id)] : 'saved')
   const tabId = $props.id()
 
   const tabs: { id: EditorTab; label: string }[] = [
@@ -18,7 +26,23 @@
     { id: 'preview', label: '미리보기' },
   ]
   const toolbar = ['bold', 'italic', 'heading', 'link', 'list', 'code'] as const
+
+  // Cmd/Ctrl+S는 노트 선택 여부와 관계없이 브라우저의 페이지 저장 대신 바로 저장한다
+  function onkeydown(event: KeyboardEvent) {
+    if ((event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 's') {
+      event.preventDefault()
+      flushNotes()
+    }
+  }
+
+  // 탭이 가려지거나 페이지를 떠날 때 기다리지 않고 저장한다
+  function onvisibilitychange() {
+    if (document.visibilityState === 'hidden') flushNotes()
+  }
 </script>
+
+<svelte:window {onkeydown} onpagehide={() => flushNotes()} />
+<svelte:document {onvisibilitychange} />
 
 <section class="editor-pane" aria-label="노트 편집">
   {#if !note}
@@ -31,7 +55,7 @@
     </div>
   {:else}
     <header class="topbar">
-      <button type="button" class="icon-button back" aria-label="목록으로" onclick={() => (ui.selectedNoteId = null)}>
+      <button type="button" class="icon-button back" aria-label="목록으로" onclick={() => selectNote(null)}>
         <Icon name="arrow-left" />
       </button>
       <SaveStatusIndicator status={saveStatus} />
@@ -70,7 +94,7 @@
           class="source"
           spellcheck="false"
           bind:value={note.source}
-          oninput={() => note && (note.dirty = true)}
+          oninput={() => note && markEdited(note)}
         ></textarea>
       </div>
       <!-- note.html은 사용자 입력에서 만들어지지만 markdown/render.ts에서 DOMPurify로 정화된 값이다. 정화를 거치지 않은 HTML을 여기에 넣지 말 것 -->

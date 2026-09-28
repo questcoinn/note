@@ -1,5 +1,5 @@
 // 정적 목업 데이터. 노트 내용은 원문(source)만 적고 제목·미리보기 문장·미리보기 HTML은 원문에서 파생한다.
-// count, updatedLabel은 아직 파생하지 않고 직접 적는다.
+// 노트는 저장소가 비어 있는 첫 실행에만 쓰인다. count는 아직 파생하지 않고 직접 적는다.
 
 export type Folder = { id: string; name: string; count: number }
 export type Tag = { id: string; name: string; count: number }
@@ -7,9 +7,13 @@ export type NoteSeed = {
   id: string
   folderId: string
   tagIds: string[]
-  updatedLabel: string
+  // 첫 실행 시각에서 이만큼 뺀 값이 수정 시각이 된다
+  minutesAgo: number
   source: string
 }
+
+const HOUR = 60
+const DAY = 24 * HOUR
 
 export const folders: Folder[] = [
   { id: 'work', name: '업무', count: 4 },
@@ -32,7 +36,7 @@ export const noteSeeds: NoteSeed[] = [
     id: 'n1',
     folderId: 'work',
     tagIds: ['meeting', 'todo'],
-    updatedLabel: '3분 전',
+    minutesAgo: 3,
     source: `# 3분기 제품 회의록
 
 검색 개선을 이번 분기 최우선으로 두고, 태그 필터는 다음 분기로 넘기기로 했어요.
@@ -55,7 +59,7 @@ export const noteSeeds: NoteSeed[] = [
     id: 'n2',
     folderId: 'work',
     tagIds: ['dev'],
-    updatedLabel: '1시간 전',
+    minutesAgo: HOUR,
     source: `# 마크다운 단축키 정리
 
 자주 쓰는 서식은 단축키로 바로 넣을 수 있어요.
@@ -77,7 +81,7 @@ function toggleBold(text: string) {
     id: 'n3',
     folderId: 'personal',
     tagIds: ['todo'],
-    updatedLabel: '어제',
+    minutesAgo: DAY,
     source: `# 주말 장보기
 
 - 우유
@@ -90,7 +94,7 @@ function toggleBold(text: string) {
     id: 'n4',
     folderId: 'personal',
     tagIds: ['reading'],
-    updatedLabel: '2일 전',
+    minutesAgo: 2 * DAY,
     source: `# 읽고 싶은 글 모음
 
 주말에 하나씩 읽기.
@@ -104,7 +108,7 @@ function toggleBold(text: string) {
     id: 'n5',
     folderId: 'work',
     tagIds: ['idea', 'dev'],
-    updatedLabel: '3일 전',
+    minutesAgo: 3 * DAY,
     source: `# 노트 앱 아이디어
 
 폴더와 태그를 함께 쓰되, 태그는 가로지르는 분류로만 쓰기.
@@ -122,7 +126,7 @@ function toggleBold(text: string) {
     id: 'n6',
     folderId: 'work',
     tagIds: ['meeting'],
-    updatedLabel: '9월 21일',
+    minutesAgo: 7 * DAY,
     source: `# 디자인 리뷰 피드백
 
 카드 그림자는 빼고 배경색으로만 상태를 구분하자는 의견이 많았어요.
@@ -136,7 +140,7 @@ function toggleBold(text: string) {
     id: 'n7',
     folderId: 'personal',
     tagIds: ['todo'],
-    updatedLabel: '9월 14일',
+    minutesAgo: 14 * DAY,
     source: `# 여행 준비물
 
 출발 전날 한 번 더 확인하기.
