@@ -1,0 +1,95 @@
+{
+  "checks": {
+    "assets_fonts_licenses": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "bound_system_authority": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "component_state_coverage": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "contrast": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "implementation_contract_complete": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "opaque_extension_preservation": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "portable_core_structure": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "reduced_motion": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "responsive_320_200": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "token_reference_closure": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "unknown_absence": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    }
+  },
+  "design_md_sha256": "2f41741daba0b22642a8e7c246a5fd3d1ad1597e1a8d2bd38aaa817a0c442678",
+  "graph_sha256": "572035426a478befd39567418369bc8b476c8d60cd117419aa0ff7f34efbb550",
+  "groups": {
+    "components-states": {
+      "evidence": [
+        "DESIGN.md#components-states"
+      ],
+      "status": "covered"
+    },
+    "content-locales": {
+      "evidence": [
+        "DESIGN.md#content-locales"
+      ],
+      "status": "covered"
+    },
+    "experience": {
+      "evidence": [
+        "DESIGN.md#experience"
+      ],
+      "status": "covered"
+    },
+    "foundations": {
+      "evidence": [
+        "DESIGN.md#foundations"
+      ],
+      "status": "covered"
+    },
+    "governance": {
+      "evidence": [
+        "DESIGN.md#governance"
+      ],
+      "status": "covered"
+    },
+    "layout-platforms": {
+      "evidence": [
+        "DESIGN.md#layout-platforms"
+      ],
+      "status": "covered"
+    },
+    "typography-assets": {
+      "evidence": [
+        "DESIGN.md#typography-assets"
+      ],
+      "status": "covered"
+    }
+  },
+  "schema_version": "2.0.0"
+}

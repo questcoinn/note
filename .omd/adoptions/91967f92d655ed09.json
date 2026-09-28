@@ -1,0 +1,45 @@
+{
+  "approved": true,
+  "authority": {
+    "identifier": "kim-wansu",
+    "role": "project-owner"
+  },
+  "checkpoint_receipt_sha256": "97d265be147ed4910f5ef3bb2a9a185aff84b3234667ea77436a99642a378474",
+  "destination": {
+    "design_md_sha256": "2f41741daba0b22642a8e7c246a5fd3d1ad1597e1a8d2bd38aaa817a0c442678",
+    "system_tree_sha256": "4e6c74c4720a1533c7d291c5db71383a48664c8de58913569f565386c3690cef"
+  },
+  "kind": "design-md-core-project-adoption-report",
+  "previous": {
+    "design_md": {
+      "present": true,
+      "sha256": "97b5dd1bad591b4161e9c285b172294026d057a38a7342ed6d688c95ec852ff5"
+    },
+    "system": {
+      "present": true,
+      "tree_sha256": "fea04c7216fd655d3299643d7c635f0f7b86a9eb525746267b13dd7356dbf69a"
+    }
+  },
+  "project_proof": {
+    "authority_mode": "core-v2-project-system",
+    "pass": true,
+    "profile": "portable-core",
+    "sha256": "8c58b43cc826b2c5b837c3adc44f42556c34d8f80fa16633cdd82f1d622a7227"
+  },
+  "recovery": {
+    "action": null,
+    "recovered": false
+  },
+  "report_path": ".omd/adoptions/91967f92d655ed09.json",
+  "schema_version": "2.0.0",
+  "source_package": {
+    "adoption_receipt_sha256": "93690fa85cf5671a0ca7d0598a5a7f9c9b2d1eea950e6d9a3f0961eafce88818",
+    "coverage_sha256": "0afa26d3ededf210b0ac41dc395e3e2bd82853116f82fe693ade5df490ae92bf",
+    "design_md_sha256": "2f41741daba0b22642a8e7c246a5fd3d1ad1597e1a8d2bd38aaa817a0c442678",
+    "graph_sha256": "572035426a478befd39567418369bc8b476c8d60cd117419aa0ff7f34efbb550",
+    "manifest_sha256": "c6bf8cda0394a85a30e4bcc3be4aad0bf6701f00f2f12582e10ee9620f835951",
+    "provenance_sha256": "5311b593ff88c8353b87a5ed3b6d493449f227e852bcef8bb54df215eaffc97a"
+  },
+  "status": "adopted",
+  "transaction_id": "91967f92d655ed09"
+}

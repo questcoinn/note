@@ -1,0 +1,337 @@
+{
+  "decisions": [
+    {
+      "evidence": [
+        ".claude/data/references/toss/DESIGN.md#2. Color Palette & Roles"
+      ],
+      "path": "foundations.tokens.color.primary",
+      "source_class": "verified-reference-inspiration",
+      "value": {
+        "$description": "인터랙션 블루 — 버튼, 링크, 활성 탭 등 실제 행동에만 사용",
+        "$type": "color",
+        "$value": "#3182f6"
+      }
+    },
+    {
+      "evidence": [
+        ".claude/data/references/toss/DESIGN.md#2. Color Palette & Roles"
+      ],
+      "path": "foundations.tokens.color.canvas",
+      "source_class": "verified-reference-inspiration",
+      "value": {
+        "$description": "전체 배경, 에디터/프리뷰의 기본 캔버스",
+        "$type": "color",
+        "$value": "#ffffff"
+      }
+    },
+    {
+      "evidence": [
+        ".claude/data/references/toss/DESIGN.md#Spacing System"
+      ],
+      "path": "foundations.tokens.spacing.lg",
+      "source_class": "verified-reference-inspiration",
+      "value": {
+        "$type": "dimension",
+        "$value": "16px"
+      }
+    },
+    {
+      "evidence": [
+        "DESIGN.md#Semantic tokens"
+      ],
+      "path": "foundations.tokens.color.success",
+      "source_class": "agent-proposed-greenfield-decision",
+      "value": {
+        "$description": "\"저장됨\" 같은 완료 상태 표시. 토스 검증 자료에 없는 값으로, 노트 앱의 저장 피드백을 위해 그린필드로 제안됨",
+        "$type": "color",
+        "$value": "#0b8f3a"
+      }
+    },
+    {
+      "evidence": [
+        "DESIGN.md#Semantic tokens"
+      ],
+      "path": "foundations.tokens.radius.card",
+      "source_class": "agent-proposed-greenfield-decision",
+      "value": {
+        "$description": "노트 카드/패널 라운드. 토스 마케팅 라운드(7px)와 TDS 버튼 라운드(16px) 사이에서 노트 앱 카드 표면을 위해 그린필드로 제안됨",
+        "$type": "dimension",
+        "$value": "12px"
+      }
+    },
+    {
+      "evidence": [
+        ".claude/data/references/toss/DESIGN.md#Font Family"
+      ],
+      "path": "typography_assets.roles.6",
+      "source_class": "agent-proposed-greenfield-decision",
+      "value": {
+        "family": "typography.family.mono",
+        "id": "code",
+        "line_height": "22px",
+        "size": "14px",
+        "usage": "마크다운 소스 에디터, 인라인 코드, 코드 블록 — 토스 레퍼런스는 모노스페이스 토큰을 검증하지 않았으므로 그린필드로 제안",
+        "weight": 400
+      }
+    },
+    {
+      "evidence": [
+        ".claude/data/references/toss/DESIGN.md#Font Family"
+      ],
+      "path": "typography_assets.fonts.toss-product-sans-redistribution-license",
+      "source_class": "unresolved"
+    },
+    {
+      "evidence": [
+        "DESIGN.md#Component: tag-chip"
+      ],
+      "path": "components_states.components.3",
+      "source_class": "agent-proposed-greenfield-decision",
+      "value": {
+        "anatomy": [
+          "label"
+        ],
+        "id": "tag-chip",
+        "interaction": {
+          "kind": "interactive",
+          "state_applicability": {
+            "default": {
+              "applicability": "applicable"
+            },
+            "disabled": {
+              "applicability": "not-applicable",
+              "reason": "태그 칩은 비활성 상태를 갖지 않음"
+            },
+            "error": {
+              "applicability": "not-applicable",
+              "reason": "해당 컴포넌트는 검증 실패 상태를 갖지 않음"
+            },
+            "focus-visible": {
+              "applicability": "applicable"
+            },
+            "hover": {
+              "applicability": "applicable"
+            },
+            "loading": {
+              "applicability": "not-applicable",
+              "reason": "노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음"
+            },
+            "success": {
+              "applicability": "not-applicable",
+              "reason": "해당 컴포넌트는 별도의 성공 상태를 표시하지 않음"
+            }
+          }
+        },
+        "semantics": "노트에 붙는 태그. 토스 배지는 상태 메타데이터로 클릭 불가지만, 이 프로젝트의 태그는 클릭 시 해당 태그로 필터링되는 탐색 행동을 가지므로 그린필드로 인터랙티브하게 확장함",
+        "states": [
+          "default",
+          "hover",
+          "focus-visible",
+          "selected"
+        ],
+        "token_refs": [
+          "color.weak-background",
+          "color.weak-foreground",
+          "radius.sm"
+        ],
+        "variants": [
+          "fill",
+          "weak"
+        ]
+      }
+    },
+    {
+      "evidence": [
+        "DESIGN.md#Locale: ko (supported)"
+      ],
+      "path": "content_locales.locales.0",
+      "source_class": "prompt-fact",
+      "value": {
+        "locale": "ko",
+        "rules": [
+          "기본이자 유일하게 지원되는 로케일. 모든 UI 카피와 빈 상태 문구는 한국어로 작성된다"
+        ],
+        "status": "supported"
+      }
+    },
+    {
+      "evidence": [
+        ".claude/data/references/toss/DESIGN.md#Current TDS documentation hierarchy"
+      ],
+      "path": "typography_assets.roles",
+      "source_class": "verified-reference-inspiration",
+      "value": [
+        {
+          "family": "typography.family.sans",
+          "id": "h1",
+          "line_height": "54px",
+          "size": "36px",
+          "usage": "노트 상세/편집 화면 제목",
+          "weight": 700
+        },
+        {
+          "family": "typography.family.sans",
+          "id": "h2",
+          "line_height": "45px",
+          "size": "30px",
+          "usage": "섹션 제목(예: 노트 목록 헤더)",
+          "weight": 600
+        },
+        {
+          "family": "typography.family.sans",
+          "id": "h3",
+          "line_height": "36px",
+          "size": "24px",
+          "usage": "노트 카드 제목, 사이드바 폴더/태그 그룹 헤더",
+          "weight": 600
+        },
+        {
+          "family": "typography.family.sans",
+          "id": "h4",
+          "line_height": "33px",
+          "size": "22px",
+          "usage": "보조 섹션 제목",
+          "weight": 600
+        },
+        {
+          "family": "typography.family.sans",
+          "id": "body",
+          "line_height": "24px",
+          "size": "16px",
+          "usage": "본문, 노트 미리보기 텍스트, 마크다운 프리뷰 기본 문단",
+          "weight": 400
+        },
+        {
+          "family": "typography.family.sans",
+          "id": "body-small",
+          "line_height": "21px",
+          "size": "14px",
+          "usage": "타임스탬프, 보조 라벨, 태그 텍스트",
+          "weight": 400
+        },
+        {
+          "family": "typography.family.mono",
+          "id": "code",
+          "line_height": "22px",
+          "size": "14px",
+          "usage": "마크다운 소스 에디터, 인라인 코드, 코드 블록 — 토스 레퍼런스는 모노스페이스 토큰을 검증하지 않았으므로 그린필드로 제안",
+          "weight": 400
+        }
+      ]
+    },
+    {
+      "evidence": [
+        ".claude/data/references/toss/DESIGN.md#TDS Mobile Button"
+      ],
+      "path": "foundations.tokens.radius.button-xl",
+      "source_class": "verified-reference-inspiration",
+      "value": {
+        "$description": "TDS xlarge 버튼 라운드 — 새 노트 등 1차 행동",
+        "$type": "dimension",
+        "$value": "16px"
+      }
+    },
+    {
+      "evidence": [
+        "DESIGN.md#Assets"
+      ],
+      "path": "typography_assets.assets.0.source_status",
+      "source_class": "agent-proposed-greenfield-decision",
+      "value": "project-owned"
+    },
+    {
+      "evidence": [
+        "DESIGN.md#Responsive constraints"
+      ],
+      "path": "layout_platforms.minimum_width_px",
+      "source_class": "agent-proposed-greenfield-decision",
+      "value": 320
+    },
+    {
+      "evidence": [
+        "DESIGN.md#Responsive constraints"
+      ],
+      "path": "layout_platforms.reflow_zoom_percent",
+      "source_class": "agent-proposed-greenfield-decision",
+      "value": 200
+    },
+    {
+      "evidence": [
+        ".claude/data/references/toss/DESIGN.md#10. Voice & Tone"
+      ],
+      "path": "content_locales.voice",
+      "source_class": "verified-reference-inspiration",
+      "value": [
+        "짧고 직접적으로 현재 상태와 다음 행동을 말한다 (예: \"저장됨\", \"일치하는 노트가 없어요\")",
+        "모호한 안심 문구나 불필요한 격식체를 쓰지 않는다",
+        "삭제·되돌리기 어려운 동작은 결과를 먼저 구체적으로 말하고 확인을 요청한다",
+        "노트 앱 맥락에서 \"가치를 먼저 보여준다\"는 토스 원칙을 빈 상태 문구에 적용한다 — 예: 빈 폴더에서는 무엇을 할 수 있는지 먼저 보여주고 행동을 유도한다"
+      ]
+    },
+    {
+      "evidence": [
+        "DESIGN.md#Component: save-status-indicator"
+      ],
+      "path": "components_states.components.5",
+      "source_class": "agent-proposed-greenfield-decision",
+      "value": {
+        "anatomy": [
+          "icon",
+          "label"
+        ],
+        "id": "save-status-indicator",
+        "interaction": {
+          "kind": "non-interactive",
+          "reason": "저장 상태는 정보 표시 전용이며 클릭 가능한 행동을 갖지 않음"
+        },
+        "semantics": "에디터 상단에 \"저장됨 / 저장 중 / 저장 안 됨\"을 문구와 색으로 함께 표시하는 상태 메타데이터. 배지처럼 클릭 행동이 없음",
+        "states": [
+          "default"
+        ],
+        "token_refs": [
+          "color.success",
+          "color.muted",
+          "color.danger"
+        ],
+        "variants": [
+          "saved",
+          "saving",
+          "unsaved"
+        ]
+      }
+    },
+    {
+      "evidence": [
+        ".omd/preferences.md#pref_mukrkreu_40ea79df"
+      ],
+      "path": "typography_assets.roles.1",
+      "source_class": "prompt-fact",
+      "value": {
+        "family": "typography.family.sans",
+        "id": "h2",
+        "line_height": "45px",
+        "size": "30px",
+        "usage": "섹션 제목(예: 노트 목록 헤더)",
+        "weight": 600
+      }
+    },
+    {
+      "evidence": [
+        ".omd/preferences.md#pref_mukrkreu_40ea79df"
+      ],
+      "path": "typography_assets.roles.2",
+      "source_class": "prompt-fact",
+      "value": {
+        "family": "typography.family.sans",
+        "id": "h3",
+        "line_height": "36px",
+        "size": "24px",
+        "usage": "노트 카드 제목, 사이드바 폴더/태그 그룹 헤더",
+        "weight": 600
+      }
+    }
+  ],
+  "design_md_sha256": "2f41741daba0b22642a8e7c246a5fd3d1ad1597e1a8d2bd38aaa817a0c442678",
+  "graph_sha256": "572035426a478befd39567418369bc8b476c8d60cd117419aa0ff7f34efbb550",
+  "schema_version": "2.0.0"
+}
