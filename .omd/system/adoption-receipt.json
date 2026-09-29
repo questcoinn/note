@@ -2,35 +2,35 @@
   "authority": "system-graph",
   "inputs": {
     "coverage_sha256": "04889b622fe30382e0d597caca26735b0ef5106856ba185af715b6bc23d1dd2f",
-    "graph_sha256": "a7c6a0ee16ef26583680ad25196717caa2877e8874e793400a3e9b279560fd63",
-    "provenance_sha256": "ca05976f31b35722ba9f6450b91eedb8f1470b7ea73561cb2afd1236e0ef3d88"
+    "graph_sha256": "dcccb921d2ebea53831a88e4423bf8fc016a2094a9a127819a24d662add8befa",
+    "provenance_sha256": "f3841b5cb8f424fe9929e3069a82afb5b1c0c90fb7757f0c22a5125209f6e208"
   },
   "kind": "design-md-core-adoption-receipt",
   "outputs": {
     "coverage": {
       "path": ".omd/system/coverage.json",
-      "sha256": "8bc772fcc212a2f15a3b2b5bf1e97e56a3186f60c7bd2b496f6fd2515d8f0833"
+      "sha256": "7dfc524b95f36f746b30c259e587daaf73263b33f76e5eef0052433f2d44fdb2"
     },
     "design_md": {
       "path": "DESIGN.md",
-      "sha256": "95ba02e3c6923eae7be80c65fce0ed388119640deb3b08021277a3d1b466cb0d"
+      "sha256": "6ad30037dc092ea09a209e4c3f0503c47c5aa2146c77fc5831e6e7ff66e18e2e"
     },
     "graph": {
       "path": ".omd/system/graph.json",
-      "sha256": "514d44fc0506e807e8401f20f27d7c78818a9935b9aaebabf36de80e8f1a649e"
+      "sha256": "0505d1789494e78509616f448cc780b0ea971b1fb7e8ed4d4c0f330fcf0e46a7"
     },
     "manifest": {
       "path": ".omd/system/manifest.json",
-      "sha256": "af1e34b4884627e329ba642e7c6cd38fc0bb4cbb7d8879e6528000b4f4371ee4"
+      "sha256": "0e32823486512eebddca49d20b377f394d1de7a4e3d52b3e8a71ffe489511392"
     },
     "provenance": {
       "path": ".omd/system/provenance.json",
-      "sha256": "f91c347717a0770c6191ff448b2eb925f121bf90427591d451b9cb0fb6a6c92a"
+      "sha256": "dd029c9f610a4857d657492e32651b924a2d847ba49d3da92cd284099c0504b3"
     }
   },
   "review": {
     "authority_transition_approved": true,
-    "receipt_sha256": "8e2ef86b892912ba74355d26e00c0df28dc047539a74f482a88dba90af82197c",
+    "receipt_sha256": "8937d67bdf27a0a2ad0aa811439f9a4e045507ce553eb859d91705bb23ebf038",
     "reviewer": {
       "identifier": "iopell2007@gmail.com",
       "role": "project-owner"

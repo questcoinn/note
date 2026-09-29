@@ -123,3 +123,71 @@ source_context: "src/lib/components/SearchInput.svelte"
 ```
 
 Keep color.border as the default input border even though it is 1.23:1 on canvas (below WCAG 1.4.11 3:1); inputs stay identifiable because every input has a visible label or a leading icon with placeholder, and hover (color.muted, 3:1) and focus (primary ring) give a 3:1 boundary; never ship an input identified only by its border
+
+## 2026-09-29T06:21:07.444Z — add-a-tag-input-component-editor-tag-row
+
+```omd-meta
+id: pref_mumafr6g_60361f45
+timestamp: 2026-09-29T06:21:07.444Z
+scope: components.input
+signal: user-statement
+confidence: explicit
+status: applied
+applied_at: 2026-09-29T06:24:34.946Z
+applied_design_md_hash: 6ad30037dc092ea09a209e4c3f0503c47c5aa2146c77fc5831e6e7ff66e18e2e
+source_agent: claude-code
+source_context: "openspec/changes/add-note-tags/design.md#D6"
+```
+
+Add a tag-input component: a row below the editor header with a visible "태그" label, the note's removable tag chips, and an always-visible text input (placeholder, color.border default border, color.muted hover, primary focus ring, radius.md) backed by a native datalist of existing tags; Enter adds a tag (ignored during IME composition), Backspace never removes tags; states default/hover/focus-visible; no error state because empty or duplicate names are silently ignored
+
+## 2026-09-29T06:21:07.444Z — tag-chip-gains-a-removable-variant-and-nav
+
+```omd-meta
+id: pref_mumafr7j_263fb5f9
+timestamp: 2026-09-29T06:21:07.444Z
+scope: components.badge
+signal: user-statement
+confidence: explicit
+status: applied
+applied_at: 2026-09-29T06:24:34.946Z
+applied_design_md_hash: 6ad30037dc092ea09a209e4c3f0503c47c5aa2146c77fc5831e6e7ff66e18e2e
+source_agent: claude-code
+source_context: "openspec/changes/add-note-tags/design.md#D5"
+```
+
+tag-chip gains a removable variant (label plus an x button named "<tag> 태그 떼기", used in the editor tag row, label itself not clickable); the note-card chip is a navigation button that switches the note list to that tag's scope and moves focus to the list title; the chip for the tag currently viewed is selected and exposed with aria-current, not aria-pressed; chips shown on a selected note card use color.canvas background; long names wrap
+
+## 2026-09-29T06:21:07.444Z — remove-the-tag-variant-from-sidebar-nav-it
+
+```omd-meta
+id: pref_mumafr8l_6f30003d
+timestamp: 2026-09-29T06:21:07.444Z
+scope: components.navigation
+signal: user-statement
+confidence: explicit
+status: applied
+applied_at: 2026-09-29T06:24:34.946Z
+applied_design_md_hash: 6ad30037dc092ea09a209e4c3f0503c47c5aa2146c77fc5831e6e7ff66e18e2e
+source_agent: claude-code
+source_context: "openspec/changes/add-note-tags/proposal.md"
+```
+
+Remove the tag variant from sidebar-nav-item: the sidebar has no tag list, tags are cross-links reached only through note-card chips; while a tag scope is shown no sidebar item is active
+
+## 2026-09-29T06:21:07.444Z — layout-sidebar-holds-folders-only
+
+```omd-meta
+id: pref_mumafr9r_3c64b2e6
+timestamp: 2026-09-29T06:21:07.444Z
+scope: layout
+signal: user-statement
+confidence: explicit
+status: applied
+applied_at: 2026-09-29T06:24:34.946Z
+applied_design_md_hash: 6ad30037dc092ea09a209e4c3f0503c47c5aa2146c77fc5831e6e7ff66e18e2e
+source_agent: claude-code
+source_context: "openspec/changes/add-note-tags/design.md#D8"
+```
+
+Layout wording: the three columns are sidebar (all notes, unfiled, folders) · note list · editor+preview, not "sidebar (folders/tags)"; the h3 role usage becomes "note card title, sidebar folder group header"; the primary task "태그와 폴더로 노트 분류 및 탐색" becomes folders for classification and tags for jumping between related notes

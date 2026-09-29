@@ -7,7 +7,8 @@ export type NoteRecord = {
   schema: typeof SCHEMA_VERSION
   id: string
   folderId: string
-  tagIds: string[]
+  // 태그 이름. 붙인 순서다. 태그는 따로 저장하지 않고 노트에 붙어 있을 때만 존재한다
+  tags: string[]
   source: string
   // ISO 8601 문자열. 문자열 비교로 시간순 정렬할 수 있다
   updatedAt: string
@@ -32,8 +33,8 @@ export function isNoteRecord(value: unknown): value is NoteRecord {
     typeof v.id === 'string' &&
     v.id !== '' &&
     typeof v.folderId === 'string' &&
-    Array.isArray(v.tagIds) &&
-    v.tagIds.every((tagId) => typeof tagId === 'string') &&
+    Array.isArray(v.tags) &&
+    v.tags.every((tag) => typeof tag === 'string') &&
     typeof v.source === 'string' &&
     typeof v.updatedAt === 'string' &&
     !Number.isNaN(Date.parse(v.updatedAt))

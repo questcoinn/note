@@ -1,12 +1,18 @@
 // UI 표시 상태만 담는다. 노트 데이터 상태는 notes.svelte.ts에 있다.
 
 import { folderById } from './folders.svelte'
-import { createNote, discardIfDraft, flushNotes, noteById, notes, type NoteDoc } from './notes.svelte'
+import { createNote, discardIfDraft, flushNotes, noteById, notes, tagSpelling, type NoteDoc } from './notes.svelte'
+import { tagKey } from './tags'
 
 export type SaveStatus = 'saved' | 'saving' | 'unsaved'
 export type EditorTab = 'edit' | 'preview'
-// 가운데 노트 목록이 보여주는 범위. 사이드바에서 고른다
-export type Scope = { kind: 'all' } | { kind: 'unfiled' } | { kind: 'folder'; id: string }
+// 가운데 노트 목록이 보여주는 범위. 사이드바나 노트 카드의 태그 칩에서 고른다.
+// 태그 범위는 key로 비교하고, name은 제목에 쓰는 철자다. 태그가 모든 노트에서 사라져도 범위는 남는다 (design.md D4)
+export type Scope =
+  | { kind: 'all' }
+  | { kind: 'unfiled' }
+  | { kind: 'folder'; id: string }
+  | { kind: 'tag'; key: string; name: string }
 
 type Forced = {
   searchEmpty: boolean
@@ -53,16 +59,24 @@ export function selectNote(id: string | null) {
 export function inScope(note: NoteDoc, scope: Scope): boolean {
   if (scope.kind === 'all') return true
   if (scope.kind === 'unfiled') return note.effectiveFolderId === ''
+  if (scope.kind === 'tag') return note.tags.some((tag) => tagKey(tag) === scope.key)
   return note.effectiveFolderId === scope.id
 }
 
 export function isSameScope(a: Scope, b: Scope): boolean {
-  return a.kind === b.kind && (a.kind !== 'folder' || (b.kind === 'folder' && a.id === b.id))
+  if (a.kind === 'folder') return b.kind === 'folder' && a.id === b.id
+  if (a.kind === 'tag') return b.kind === 'tag' && a.key === b.key
+  return a.kind === b.kind
+}
+
+export function tagScope(name: string): Scope {
+  return { kind: 'tag', key: tagKey(name), name }
 }
 
 export function scopeName(scope: Scope): string {
   if (scope.kind === 'all') return '전체 노트'
   if (scope.kind === 'unfiled') return '폴더 없음'
+  if (scope.kind === 'tag') return `#${scope.name}`
   return folderById.get(scope.id)?.name ?? ''
 }
 
@@ -72,7 +86,8 @@ export function scopedNotes(): NoteDoc[] {
 
 // 목록 빈 상태(노트 없음, 빈 폴더)가 "새 노트" 버튼을 보여주는지. 그때 에디터 빈 상태는 버튼을 뺀다
 export function listEmptyShowsNewNote(): boolean {
-  if (forced.searchEmpty || scopedNotes().length > 0) return false
+  // 태그 범위의 빈 상태는 노트가 하나도 없어도 버튼이 없다 (design.md D4)
+  if (forced.searchEmpty || ui.scope.kind === 'tag' || scopedNotes().length > 0) return false
   return notes.length === 0 || ui.scope.kind === 'folder'
 }
 
@@ -81,15 +96,20 @@ export function selectScope(scope: Scope) {
   ui.scope = scope
 }
 
-// 폴더 범위에서 만든 새 노트는 그 폴더에 들어간다
+// 폴더 범위에서 만든 새 노트는 그 폴더에 들어간다. 태그 범위는 폴더가 아니다
 function scopeFolderId(): string {
   return ui.scope.kind === 'folder' ? ui.scope.id : ''
+}
+
+// 태그 범위에서 만든 새 노트에는 그 태그가 붙는다. 다른 노트가 쓰는 철자를 따른다
+function scopeTags(): string[] {
+  return ui.scope.kind === 'tag' ? [tagSpelling(ui.scope.name)] : []
 }
 
 // 모든 "새 노트" 버튼이 부른다. 이미 기록 전 새 노트를 보고 있으면 더 만들지 않고 포커스만 옮긴다 (design.md D6)
 export function startNewNote() {
   const current = ui.selectedNoteId === null ? undefined : noteById.get(ui.selectedNoteId)
-  if (!current?.draft) selectNote(createNote(scopeFolderId()))
+  if (!current?.draft) selectNote(createNote(scopeFolderId(), scopeTags()))
   ui.editorTab = 'edit'
   // 오버레이의 close()와 달리 토글 버튼으로 포커스를 돌려주지 않는다. 포커스는 원문으로 간다
   ui.sidebarOpen = false

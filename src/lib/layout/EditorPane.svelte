@@ -17,6 +17,7 @@
   import MarkdownToolbarButton from '../components/MarkdownToolbarButton.svelte'
   import PrimaryButton from '../components/PrimaryButton.svelte'
   import SaveStatusIndicator from '../components/SaveStatusIndicator.svelte'
+  import TagInput from '../components/TagInput.svelte'
 
   // 저장 대기와 쓰기 진행은 둘 다 "저장 중"으로 보인다 (design.md D8)
   const statusByPhase: Record<SavePhase, SaveStatus> = {
@@ -106,6 +107,11 @@
         <Icon name="trash" />
       </button>
     </header>
+
+    <!-- 노트마다 새로 만들어, 붙이지 않은 입력을 다음 노트로 가져가지 않는다 (design.md D6) -->
+    {#key note.id}
+      <TagInput {note} />
+    {/key}
 
     <div class="toolbar" role="toolbar" aria-label="서식">
       {#each toolbar as variant (variant)}

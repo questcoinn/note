@@ -6,12 +6,14 @@ import { folderById, removeFolderFromMemory, removeFolderRecord } from './folder
 import { extractTitleAndSnippet, parse, renderHtml } from './markdown/render'
 import { AutosaveController, type SavePhase } from './persistence/autosave.svelte'
 import { SCHEMA_VERSION, type NoteRecord, type NoteStore } from './persistence/store'
+import { normalizeTagInput, tagKey } from './tags'
 
 export class NoteDoc {
   readonly id: string
   // 저장본의 값 그대로다. 없는 폴더를 가리킬 수 있으므로 화면은 effectiveFolderId를 쓴다 (design.md D3)
   folderId = $state('')
-  readonly tagIds: string[]
+  // 태그 이름, 붙인 순서. 배열을 통째로 바꿔 넣는다 (design.md D1)
+  tags = $state<string[]>([])
 
   source = $state('')
   updatedAt = $state('')
@@ -30,7 +32,7 @@ export class NoteDoc {
   constructor(record: NoteRecord, draft = false) {
     this.id = record.id
     this.folderId = record.folderId
-    this.tagIds = record.tagIds
+    this.tags = [...record.tags]
     this.source = record.source
     this.updatedAt = record.updatedAt
     this.draft = draft
@@ -41,7 +43,7 @@ export class NoteDoc {
       schema: SCHEMA_VERSION,
       id: this.id,
       folderId: this.folderId,
-      tagIds: [...this.tagIds],
+      tags: [...this.tags],
       source: this.source,
       updatedAt: this.updatedAt,
     }
@@ -77,14 +79,14 @@ function newNoteId(): string {
   return crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
 }
 
-// 기록 전 새 노트를 만든다. 태그는 없고, 폴더는 만든 범위의 폴더다('' 이면 폴더 없음)
-export function createNote(folderId: string): string {
+// 기록 전 새 노트를 만든다. 폴더와 태그는 만든 범위에서 온다('' 이면 폴더 없음)
+export function createNote(folderId: string, tags: string[] = []): string {
   const note = new NoteDoc(
     {
       schema: SCHEMA_VERSION,
       id: newNoteId(),
       folderId,
-      tagIds: [],
+      tags,
       source: '',
       updatedAt: new Date().toISOString(),
     },
@@ -131,9 +133,57 @@ export async function deleteNote(id: string) {
 export function moveNote(note: NoteDoc, folderId: string) {
   if (note.effectiveFolderId === folderId) return
   note.folderId = folderId
+  saveMetadataNow(note)
+}
+
+// 폴더·태그처럼 원문이 아닌 값을 바꾼 뒤 부른다. 기록 전 새 노트는 기록하지 않는다
+function saveMetadataNow(note: NoteDoc) {
   if (note.draft) return
   autosave?.schedule(note.id)
   autosave?.flush(note.id)
+}
+
+const collator = new Intl.Collator('ko')
+
+// 태그 키 -> 철자. notes 순서로 훑어 키가 처음 나온 철자를 쓴다. 기록 전 새 노트도 포함한다 (design.md D2)
+const usedTags = $derived.by(() => {
+  const spellings = new Map<string, string>()
+  for (const note of notes) {
+    for (const tag of note.tags) {
+      const key = tagKey(tag)
+      if (!spellings.has(key)) spellings.set(key, tag)
+    }
+  }
+  return spellings
+})
+
+// 다른 노트가 쓰는 철자가 있으면 그 철자
+export function tagSpelling(name: string): string {
+  return usedTags.get(tagKey(name)) ?? name
+}
+
+// 이 노트에는 없는 사용 중인 태그, 가나다순
+export function tagSuggestions(note: NoteDoc): string[] {
+  const own = new Set(note.tags.map(tagKey))
+  return [...usedTags.values()].filter((tag) => !own.has(tagKey(tag))).sort(collator.compare)
+}
+
+// 빈 이름과 이미 붙은 태그는 조용히 무시한다. 수정 시각은 그대로 둔다 (design.md D3)
+export function addTag(note: NoteDoc, raw: string) {
+  const name = normalizeTagInput(raw)
+  if (name === '') return
+  const key = tagKey(name)
+  if (note.tags.some((tag) => tagKey(tag) === key)) return
+  note.tags = [...note.tags, tagSpelling(name)]
+  saveMetadataNow(note)
+}
+
+export function removeTag(note: NoteDoc, name: string) {
+  const key = tagKey(name)
+  const remaining = note.tags.filter((tag) => tagKey(tag) !== key)
+  if (remaining.length === note.tags.length) return
+  note.tags = remaining
+  saveMetadataNow(note)
 }
 
 // 폴더 id -> 폴더 삭제 중 저장에 실패한 노트 id

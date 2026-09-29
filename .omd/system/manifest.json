@@ -3,19 +3,19 @@
   "artifacts": {
     "coverage": {
       "path": ".omd/system/coverage.json",
-      "sha256": "8bc772fcc212a2f15a3b2b5bf1e97e56a3186f60c7bd2b496f6fd2515d8f0833"
+      "sha256": "7dfc524b95f36f746b30c259e587daaf73263b33f76e5eef0052433f2d44fdb2"
     },
     "design_md": {
       "path": "DESIGN.md",
-      "sha256": "95ba02e3c6923eae7be80c65fce0ed388119640deb3b08021277a3d1b466cb0d"
+      "sha256": "6ad30037dc092ea09a209e4c3f0503c47c5aa2146c77fc5831e6e7ff66e18e2e"
     },
     "graph": {
       "path": ".omd/system/graph.json",
-      "sha256": "514d44fc0506e807e8401f20f27d7c78818a9935b9aaebabf36de80e8f1a649e"
+      "sha256": "0505d1789494e78509616f448cc780b0ea971b1fb7e8ed4d4c0f330fcf0e46a7"
     },
     "provenance": {
       "path": ".omd/system/provenance.json",
-      "sha256": "f91c347717a0770c6191ff448b2eb925f121bf90427591d451b9cb0fb6a6c92a"
+      "sha256": "dd029c9f610a4857d657492e32651b924a2d847ba49d3da92cd284099c0504b3"
     }
   },
   "authority": {

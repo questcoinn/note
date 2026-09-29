@@ -1,15 +1,22 @@
 <script lang="ts">
   import { clock, formatUpdatedLabel } from '../clock.svelte'
   import type { NoteDoc } from '../notes.svelte'
+  import { tagKey } from '../tags'
+  import TagChip from './TagChip.svelte'
 
   let {
     note,
     selected = false,
     onselect,
+    currentTagKey,
+    onselecttag,
   }: {
     note: NoteDoc
     selected?: boolean
     onselect: () => void
+    // 지금 보고 있는 태그 범위의 키. 그 칩은 selected로 보이고 눌러도 아무것도 하지 않는다
+    currentTagKey?: string
+    onselecttag: (name: string) => void
   } = $props()
 </script>
 
@@ -25,6 +32,16 @@
   {/if}
   <div class="meta">
     <span class="timestamp">{formatUpdatedLabel(note.updatedAt, clock.now)}</span>
+    {#if note.tags.length > 0}
+      <ul class="tags" aria-label="태그">
+        {#each note.tags as tag (tag)}
+          {@const current = tagKey(tag) === currentTagKey}
+          <li>
+            <TagChip label={tag} selected={current} onclick={() => current || onselecttag(tag)} />
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </div>
 </article>
 
@@ -92,6 +109,34 @@
     align-items: center;
     gap: var(--spacing-md);
     margin-top: var(--spacing-xs);
+  }
+
+  .tags {
+    /* 늘린 제목 버튼 위로 올려 칩이 따로 눌리게 한다 */
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tags li {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* selected 카드의 배경과 weak 칩 배경이 같아 칩을 canvas로 띄운다. 지금 보는 태그의 칩은 selected 색을 유지한다 */
+  .selected :global(.tag-chip.weak:not(.selected)) {
+    background: var(--color-canvas);
+  }
+
+  .selected :global(.tag-chip.weak:not(.selected):hover) {
+    background: var(--color-weak-background);
   }
 
   .timestamp {

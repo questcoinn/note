@@ -11,7 +11,7 @@
     menu,
     button = $bindable(),
   }: {
-    variant: 'folder' | 'tag' | 'all-notes' | 'unfiled'
+    variant: 'folder' | 'all-notes' | 'unfiled'
     label: string
     count: number
     active?: boolean
@@ -23,7 +23,7 @@
   } = $props()
 
   const iconName = $derived(
-    variant === 'folder' ? 'folder' : variant === 'tag' ? 'hash' : variant === 'unfiled' ? 'inbox' : 'file-text',
+    variant === 'folder' ? 'folder' : variant === 'unfiled' ? 'inbox' : 'file-text',
   )
 </script>
 

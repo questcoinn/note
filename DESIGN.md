@@ -16,7 +16,7 @@
 
 - 노트 목록에서 최근/전체 노트 훑어보기
 
-- 태그와 폴더로 노트 분류 및 탐색
+- 폴더로 노트를 분류하고, 태그로 관련 노트 사이를 오가기
 
 - 검색으로 특정 노트 즉시 찾기
 
@@ -122,7 +122,7 @@ Required.
 |---|---|---|---|---|---|
 | h1 | 노트 상세/편집 화면 제목 | typography.family.sans | 36px | 700 | 54px |
 | h2 | 섹션 제목(예: 노트 목록 헤더) | typography.family.sans | 30px | 600 | 45px |
-| h3 | 노트 카드 제목, 사이드바 폴더/태그 그룹 헤더 | typography.family.sans | 24px | 600 | 36px |
+| h3 | 노트 카드 제목, 사이드바 폴더 그룹 헤더 | typography.family.sans | 24px | 600 | 36px |
 | h4 | 보조 섹션 제목 | typography.family.sans | 22px | 600 | 33px |
 | body | 본문, 노트 미리보기 텍스트, 마크다운 프리뷰 기본 문단 | typography.family.sans | 16px | 400 | 24px |
 | body-small | 타임스탬프, 보조 라벨, 태그 텍스트 | typography.family.sans | 14px | 400 | 21px |
@@ -194,10 +194,10 @@ Required.
 
 ### Component: sidebar-nav-item
 
-**Semantics:** 사이드바의 범위 탐색 항목. 누르면 가운데 노트 목록을 그 범위(전체 노트, 폴더 없음, 폴더)로 좁힌다. "전체 노트"와 "폴더 없음"은 이름 변경·삭제가 없는 고정 항목이고, 폴더 항목만 뒤에 folder-menu 버튼을 가진다
+**Semantics:** 사이드바의 범위 탐색 항목. 누르면 가운데 노트 목록을 그 범위(전체 노트, 폴더 없음, 폴더)로 좁힌다. "전체 노트"와 "폴더 없음"은 이름 변경·삭제가 없는 고정 항목이고, 폴더 항목만 뒤에 folder-menu 버튼을 가진다. 사이드바에는 태그 목록이 없으며, 노트 카드의 태그 칩으로 태그 범위를 보는 동안에는 어느 항목도 active가 아니다
 
 - Anatomy: icon, label, count-badge, optional-menu-button
-- Variants: folder, tag, all-notes, unfiled
+- Variants: folder, all-notes, unfiled
 - States: default, hover, focus-visible, active
 - Token references: color.body, color.weak-background, color.weak-foreground
 
@@ -217,12 +217,12 @@ Required.
 
 ### Component: tag-chip
 
-**Semantics:** 노트에 붙는 태그. 토스 배지는 상태 메타데이터로 클릭 불가지만, 이 프로젝트의 태그는 클릭 시 해당 태그로 필터링되는 탐색 행동을 가지므로 그린필드로 인터랙티브하게 확장함
+**Semantics:** 노트에 붙는 태그. 토스 배지는 상태 메타데이터로 클릭 불가지만, 이 프로젝트의 태그는 노트 사이를 잇는 꼬리표라 인터랙티브하게 확장함. 노트 카드의 칩은 `#`과 이름을 보이는 탐색 버튼으로, 누르면 노트 목록을 그 태그 범위로 바꾸고 포커스를 목록 제목으로 옮긴다. 지금 보고 있는 태그의 칩은 selected이며 aria-pressed가 아닌 aria-current로 알린다. selected 노트 카드 위의 칩은 canvas 배경을 쓴다. removable 변형은 에디터 태그 줄에서 쓰며, 라벨 자체는 누를 수 없고 뒤의 x 버튼("<태그> 태그 떼기")으로만 태그를 뗀다. 긴 이름은 줄바꿈한다
 
-- Anatomy: label
-- Variants: fill, weak
+- Anatomy: label, optional-remove-button
+- Variants: fill, weak, removable
 - States: default, hover, focus-visible, selected
-- Token references: color.weak-background, color.weak-foreground, radius.sm
+- Token references: color.weak-background, color.weak-foreground, color.canvas, radius.sm
 
 - Interaction kind: interactive
 
@@ -365,6 +365,29 @@ Required.
 | error | applicable |  |
 | success | not-applicable | 해당 컴포넌트는 별도의 성공 상태를 표시하지 않음 |
 
+### Component: tag-input
+
+**Semantics:** 에디터 상단 줄 아래의 태그 줄. 보이는 "태그" 라벨, 그 노트의 removable 태그 칩, 늘 보이는 입력창과 기존 태그를 제안하는 네이티브 datalist로 이뤄진다. Enter로 태그를 붙이되 입력기 조합 중 Enter는 무시하고, Backspace로는 태그를 떼지 않는다. 빈 이름과 이미 붙은 이름은 조용히 무시한다
+
+- Anatomy: label, tag-chips, input-text, suggestion-list
+- Variants: box
+- States: default, hover, focus-visible
+- Token references: color.foreground, color.border, color.muted, color.primary, radius.md
+
+- Interaction kind: interactive
+
+#### State applicability
+
+| State | Applicability | Reason |
+|---|---|---|
+| default | applicable |  |
+| hover | applicable |  |
+| focus-visible | applicable |  |
+| disabled | not-applicable | 노트가 열려 있을 때만 보이며 항상 입력할 수 있음 |
+| loading | not-applicable | 노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음 |
+| error | not-applicable | 빈 이름과 중복 이름은 문구 없이 무시하므로 검증 실패 상태가 없음 |
+| success | not-applicable | 해당 컴포넌트는 별도의 성공 상태를 표시하지 않음 |
+
 ### Rules
 
 - 모든 interactive 컴포넌트는 default/hover/focus-visible을 반드시 구현한다
@@ -373,7 +396,7 @@ Required.
 
 - 저장 상태는 항상 아이콘과 문구를 함께 제공해 색만으로 의미를 전달하지 않는다
 
-- 입력 컴포넌트(search-input, text-field, folder-select)의 기본 테두리는 color.border를 유지한다. 캔버스 대비 1.23:1로 WCAG 1.4.11의 3:1에 못 미치지만, 모든 입력은 보이는 라벨 또는 앞쪽 아이콘과 placeholder로 식별되고 hover(color.muted, 3:1)와 focus-visible(primary 링)에서 3:1 이상의 경계를 가진다. 라벨·아이콘 없이 테두리만으로 식별되는 입력은 만들지 않는다
+- 입력 컴포넌트(search-input, text-field, folder-select, tag-input)의 기본 테두리는 color.border를 유지한다. 캔버스 대비 1.23:1로 WCAG 1.4.11의 3:1에 못 미치지만, 모든 입력은 보이는 라벨 또는 앞쪽 아이콘과 placeholder로 식별되고 hover(color.muted, 3:1)와 focus-visible(primary 링)에서 3:1 이상의 경계를 가진다. 라벨·아이콘 없이 테두리만으로 식별되는 입력은 만들지 않는다
 
 <!-- design-md:section layout-platforms -->
 ## 5. Layout & Platforms
@@ -385,7 +408,7 @@ Required.
 
 ### Layout rules
 
-- 기본 레이아웃은 사이드바(폴더/태그) · 노트 목록 · 에디터+프리뷰의 3단 구성
+- 기본 레이아웃은 사이드바(전체 노트, 폴더 없음, 폴더) · 노트 목록 · 에디터+프리뷰의 3단 구성. 사이드바에는 태그 목록을 두지 않는다
 
 - 320px~200% 확대까지 콘텐츠 손실 없이 리플로우되어야 하며, 좁은 화면에서는 3단을 순차적인 단일 컬럼으로 접는다
 
@@ -482,5 +505,5 @@ Record, review, and validate changes before adoption.
 - foundations.tokens.radius.card — agent-proposed-greenfield-decision; value: {"$description":"노트 카드/패널 라운드. 토스 마케팅 라운드(7px)와 TDS 버튼 라운드(16px) 사이에서 노트 앱 카드 표면을 위해 그린필드로 제안됨","$type":"dimension","$value":"12px"}; evidence: DESIGN.md#Semantic tokens
 - typography_assets.roles.6 — agent-proposed-greenfield-decision; value: {"family":"typography.family.mono","id":"code","line_height":"22px","size":"14px","usage":"마크다운 소스 에디터, 인라인 코드, 코드 블록 — 토스 레퍼런스는 모노스페이스 토큰을 검증하지 않았으므로 그린필드로 제안","weight":400}; evidence: .claude/data/references/toss/DESIGN.md#Font Family
 - typography_assets.fonts.toss-product-sans-redistribution-license — unresolved; evidence: .claude/data/references/toss/DESIGN.md#Font Family
-- components_states.components.3 — agent-proposed-greenfield-decision; value: {"anatomy":["label"],"id":"tag-chip","interaction":{"kind":"interactive","state_applicability":{"default":{"applicability":"applicable"},"disabled":{"applicability":"not-applicable","reason":"태그 칩은 비활성 상태를 갖지 않음"},"error":{"applicability":"not-applicable","reason":"해당 컴포넌트는 검증 실패 상태를 갖지 않음"},"focus-visible":{"applicability":"applicable"},"hover":{"applicability":"applicable"},"loading":{"applicability":"not-applicable","reason":"노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음"},"success":{"applicability":"not-applicable","reason":"해당 컴포넌트는 별도의 성공 상태를 표시하지 않음"}}},"semantics":"노트에 붙는 태그. 토스 배지는 상태 메타데이터로 클릭 불가지만, 이 프로젝트의 태그는 클릭 시 해당 태그로 필터링되는 탐색 행동을 가지므로 그린필드로 인터랙티브하게 확장함","states":["default","hover","focus-visible","selected"],"token_refs":["color.weak-background","color.weak-foreground","radius.sm"],"variants":["fill","weak"]}; evidence: DESIGN.md#Component: tag-chip
+- components_states.components.3 — prompt-fact; value: {"anatomy":["label","optional-remove-button"],"id":"tag-chip","interaction":{"kind":"interactive","state_applicability":{"default":{"applicability":"applicable"},"disabled":{"applicability":"not-applicable","reason":"태그 칩은 비활성 상태를 갖지 않음"},"error":{"applicability":"not-applicable","reason":"해당 컴포넌트는 검증 실패 상태를 갖지 않음"},"focus-visible":{"applicability":"applicable"},"hover":{"applicability":"applicable"},"loading":{"applicability":"not-applicable","reason":"노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음"},"success":{"applicability":"not-applicable","reason":"해당 컴포넌트는 별도의 성공 상태를 표시하지 않음"}}},"semantics":"노트에 붙는 태그. 토스 배지는 상태 메타데이터로 클릭 불가지만, 이 프로젝트의 태그는 노트 사이를 잇는 꼬리표라 인터랙티브하게 확장함. 노트 카드의 칩은 `#`과 이름을 보이는 탐색 버튼으로, 누르면 노트 목록을 그 태그 범위로 바꾸고 포커스를 목록 제목으로 옮긴다. 지금 보고 있는 태그의 칩은 selected이며 aria-pressed가 아닌 aria-current로 알린다. selected 노트 카드 위의 칩은 canvas 배경을 쓴다. removable 변형은 에디터 태그 줄에서 쓰며, 라벨 자체는 누를 수 없고 뒤의 x 버튼(\"<태그> 태그 떼기\")으로만 태그를 뗀다. 긴 이름은 줄바꿈한다","states":["default","hover","focus-visible","selected"],"token_refs":["color.weak-background","color.weak-foreground","color.canvas","radius.sm"],"variants":["fill","weak","removable"]}; evidence: .omd/preferences.md#pref_mumafr7j_263fb5f9
 - content_locales.locales.0 — prompt-fact; value: {"locale":"ko","rules":["기본이자 유일하게 지원되는 로케일. 모든 UI 카피와 빈 상태 문구는 한국어로 작성된다"],"status":"supported"}; evidence: DESIGN.md#Locale: ko (supported)

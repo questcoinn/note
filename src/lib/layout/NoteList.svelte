@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte'
   import { notes, type NoteDoc } from '../notes.svelte'
   import {
     FORCED_SEARCH_QUERY,
@@ -6,7 +7,9 @@
     scopedNotes,
     scopeName,
     selectNote,
+    selectScope,
     startNewNote,
+    tagScope,
     ui,
   } from '../ui-state.svelte'
   import EmptyState from '../components/EmptyState.svelte'
@@ -21,6 +24,14 @@
   const sortKey = (note: NoteDoc) =>
     note.id === ui.selectedNoteId && ui.pinnedSortKey !== null ? ui.pinnedSortKey : note.updatedAt
   const title = $derived(scopeName(ui.scope))
+  const currentTagKey = $derived(ui.scope.kind === 'tag' ? ui.scope.key : undefined)
+
+  // 누른 칩은 바뀐 목록의 다른 자리로 옮겨 가므로, 포커스를 목록 제목으로 옮겨 새 범위를 처음부터 읽게 한다 (design.md D5)
+  async function openTagScope(name: string) {
+    selectScope(tagScope(name))
+    await tick()
+    document.getElementById('note-list-title')?.focus()
+  }
   const inScopeNotes = $derived(scopedNotes())
   const sortedNotes = $derived(
     inScopeNotes.toSorted((a, b) => sortKey(b).localeCompare(sortKey(a)) || a.id.localeCompare(b.id)),
@@ -52,6 +63,9 @@
       title="일치하는 노트가 없어요"
       description="검색어를 줄이거나 다른 단어로 찾아보세요."
     />
+  {:else if inScopeNotes.length === 0 && ui.scope.kind === 'tag'}
+    <!-- 노트가 하나도 없어도 제목(#태그)에 맞는 이 상태가 먼저다. 태그 이름은 받침에 따라 조사가 달라져 문구에 넣지 않는다 (design.md D7) -->
+    <EmptyState icon="hash" title="이 태그가 붙은 노트가 없어요" description="노트에 이 태그를 붙이면 여기에 모여요." />
   {:else if inScopeNotes.length === 0 && ui.scope.kind === 'folder'}
     <EmptyState icon="folder" title="{title}에 노트를 모아 둘 수 있어요" description="새 노트를 만들면 이 폴더에 바로 담겨요.">
       {#snippet action()}
@@ -70,7 +84,13 @@
     <ul class="cards">
       {#each sortedNotes as note (note.id)}
         <li>
-          <NoteCard {note} selected={ui.selectedNoteId === note.id} onselect={() => selectNote(note.id)} />
+          <NoteCard
+            {note}
+            selected={ui.selectedNoteId === note.id}
+            onselect={() => selectNote(note.id)}
+            {currentTagKey}
+            onselecttag={openTagScope}
+          />
         </li>
       {/each}
     </ul>
