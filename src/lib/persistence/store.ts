@@ -1,4 +1,4 @@
-// 노트 저장소 인터페이스와 저장 레코드 형식. 저장소 구현은 이 인터페이스 뒤에서만 바꾼다.
+// 노트·폴더 저장소 인터페이스와 저장 레코드 형식. 저장소 구현은 이 인터페이스 뒤에서만 바꾼다.
 
 export const SCHEMA_VERSION = 1
 
@@ -37,5 +37,31 @@ export function isNoteRecord(value: unknown): value is NoteRecord {
     typeof v.source === 'string' &&
     typeof v.updatedAt === 'string' &&
     !Number.isNaN(Date.parse(v.updatedAt))
+  )
+}
+
+// 노트는 folderId로 폴더를 가리킨다. '' 또는 없는 폴더 id면 "폴더 없음"이다
+export type FolderRecord = {
+  schema: typeof SCHEMA_VERSION
+  id: string
+  name: string
+}
+
+// NoteStore와 같은 규칙을 따른다
+export interface FolderStore {
+  loadAllFolders(): Promise<FolderRecord[]>
+  putFolder(folder: FolderRecord): Promise<void>
+  removeFolder(id: string): Promise<void>
+}
+
+export function isFolderRecord(value: unknown): value is FolderRecord {
+  if (typeof value !== 'object' || value === null) return false
+  const v = value as Record<string, unknown>
+  return (
+    v.schema === SCHEMA_VERSION &&
+    typeof v.id === 'string' &&
+    v.id !== '' &&
+    typeof v.name === 'string' &&
+    v.name.trim() !== ''
   )
 }

@@ -1,6 +1,14 @@
 <script lang="ts">
   import { notes, type NoteDoc } from '../notes.svelte'
-  import { FORCED_SEARCH_QUERY, forced, selectNote, startNewNote, ui } from '../ui-state.svelte'
+  import {
+    FORCED_SEARCH_QUERY,
+    forced,
+    scopedNotes,
+    scopeName,
+    selectNote,
+    startNewNote,
+    ui,
+  } from '../ui-state.svelte'
   import EmptyState from '../components/EmptyState.svelte'
   import Icon from '../components/Icon.svelte'
   import NoteCard from '../components/NoteCard.svelte'
@@ -12,8 +20,10 @@
   // 최근 수정 순. 선택된 노트만 선택한 순간의 수정 시각으로 정렬해, 편집하는 동안 제자리에 둔다 (design.md D6)
   const sortKey = (note: NoteDoc) =>
     note.id === ui.selectedNoteId && ui.pinnedSortKey !== null ? ui.pinnedSortKey : note.updatedAt
+  const title = $derived(scopeName(ui.scope))
+  const inScopeNotes = $derived(scopedNotes())
   const sortedNotes = $derived(
-    notes.toSorted((a, b) => sortKey(b).localeCompare(sortKey(a)) || a.id.localeCompare(b.id)),
+    inScopeNotes.toSorted((a, b) => sortKey(b).localeCompare(sortKey(a)) || a.id.localeCompare(b.id)),
   )
 </script>
 
@@ -31,7 +41,7 @@
       <Icon name="menu" />
     </button>
     <!-- 노트를 삭제한 뒤 포커스를 받는 자리 (design.md D5) -->
-    <h2 id="note-list-title" class="title" tabindex="-1">전체 노트</h2>
+    <h2 id="note-list-title" class="title" tabindex="-1">{title}</h2>
   </header>
 
   <SearchInput bind:value={query} />
@@ -42,12 +52,20 @@
       title="일치하는 노트가 없어요"
       description="검색어를 줄이거나 다른 단어로 찾아보세요."
     />
+  {:else if inScopeNotes.length === 0 && ui.scope.kind === 'folder'}
+    <EmptyState icon="folder" title="{title}에 노트를 모아 둘 수 있어요" description="새 노트를 만들면 이 폴더에 바로 담겨요.">
+      {#snippet action()}
+        <PrimaryButton icon="plus" onclick={startNewNote}>새 노트</PrimaryButton>
+      {/snippet}
+    </EmptyState>
   {:else if notes.length === 0}
     <EmptyState icon="file-text" title="아직 노트가 없어요" description="떠오른 생각을 바로 적어 두세요.">
       {#snippet action()}
         <PrimaryButton icon="plus" onclick={startNewNote}>새 노트</PrimaryButton>
       {/snippet}
     </EmptyState>
+  {:else if inScopeNotes.length === 0}
+    <EmptyState icon="inbox" title="모든 노트가 폴더에 정리되어 있어요" description="폴더에 넣지 않은 노트가 여기에 모여요." />
   {:else}
     <ul class="cards">
       {#each sortedNotes as note (note.id)}

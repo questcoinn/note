@@ -1,38 +1,38 @@
 {
   "authority": "system-graph",
   "inputs": {
-    "coverage_sha256": "70765afec33b00a8a9ce81e401764cd7195c067a49b0de500106c2b75e7da0a8",
-    "graph_sha256": "283e706cc7afa0acf5bab17bc2d83fb6dc862a185dbc25e6be17e3b26b7460f3",
-    "provenance_sha256": "a2620ce63d8c0a99496a1e8732d224ae5a9f969d7126a8e20264c8ebdb9dda33"
+    "coverage_sha256": "04889b622fe30382e0d597caca26735b0ef5106856ba185af715b6bc23d1dd2f",
+    "graph_sha256": "a7c6a0ee16ef26583680ad25196717caa2877e8874e793400a3e9b279560fd63",
+    "provenance_sha256": "ca05976f31b35722ba9f6450b91eedb8f1470b7ea73561cb2afd1236e0ef3d88"
   },
   "kind": "design-md-core-adoption-receipt",
   "outputs": {
     "coverage": {
       "path": ".omd/system/coverage.json",
-      "sha256": "0afa26d3ededf210b0ac41dc395e3e2bd82853116f82fe693ade5df490ae92bf"
+      "sha256": "8bc772fcc212a2f15a3b2b5bf1e97e56a3186f60c7bd2b496f6fd2515d8f0833"
     },
     "design_md": {
       "path": "DESIGN.md",
-      "sha256": "2f41741daba0b22642a8e7c246a5fd3d1ad1597e1a8d2bd38aaa817a0c442678"
+      "sha256": "95ba02e3c6923eae7be80c65fce0ed388119640deb3b08021277a3d1b466cb0d"
     },
     "graph": {
       "path": ".omd/system/graph.json",
-      "sha256": "572035426a478befd39567418369bc8b476c8d60cd117419aa0ff7f34efbb550"
+      "sha256": "514d44fc0506e807e8401f20f27d7c78818a9935b9aaebabf36de80e8f1a649e"
     },
     "manifest": {
       "path": ".omd/system/manifest.json",
-      "sha256": "c6bf8cda0394a85a30e4bcc3be4aad0bf6701f00f2f12582e10ee9620f835951"
+      "sha256": "af1e34b4884627e329ba642e7c6cd38fc0bb4cbb7d8879e6528000b4f4371ee4"
     },
     "provenance": {
       "path": ".omd/system/provenance.json",
-      "sha256": "5311b593ff88c8353b87a5ed3b6d493449f227e852bcef8bb54df215eaffc97a"
+      "sha256": "f91c347717a0770c6191ff448b2eb925f121bf90427591d451b9cb0fb6a6c92a"
     }
   },
   "review": {
     "authority_transition_approved": true,
-    "receipt_sha256": "a19602d8feb931168a0eff0f835cc9c67b25cfb982e6e5cd56aaa021a57933d9",
+    "receipt_sha256": "8e2ef86b892912ba74355d26e00c0df28dc047539a74f482a88dba90af82197c",
     "reviewer": {
-      "identifier": "kim-wansu",
+      "identifier": "iopell2007@gmail.com",
       "role": "project-owner"
     }
   },

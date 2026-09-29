@@ -62,7 +62,7 @@
 - **color.body**: `#4e5968` — 본문 텍스트, 노트 목록 미리보기 텍스트
 - **color.border**: `#e5e8eb` — 패널 사이 경계선, 입력창 기본 테두리
 - **color.canvas**: `#ffffff` — 전체 배경, 에디터/프리뷰의 기본 캔버스
-- **color.danger**: `#e42939` — 삭제 확인, 저장 실패 등 되돌리기 어려운 위험 상태
+- **color.danger**: `#dc2535` — 삭제 확인, 저장 실패 등 되돌리기 어려운 위험 상태
 - **color.foreground**: `#191f28` — 제목과 본문 중 가장 강한 텍스트
 - **color.muted**: `#8b95a1` — 타임스탬프, 보조 라벨, placeholder. 흰 배경에서도 대비가 약 3:1로 낮으므로 본문에는 사용하지 않고 비필수 보조 정보에만 사용
 - **color.on-primary**: `#ffffff` — primary 배경 위의 텍스트/아이콘
@@ -194,10 +194,10 @@ Required.
 
 ### Component: sidebar-nav-item
 
-**Semantics:** 사이드바의 폴더/태그 탐색 항목
+**Semantics:** 사이드바의 범위 탐색 항목. 누르면 가운데 노트 목록을 그 범위(전체 노트, 폴더 없음, 폴더)로 좁힌다. "전체 노트"와 "폴더 없음"은 이름 변경·삭제가 없는 고정 항목이고, 폴더 항목만 뒤에 folder-menu 버튼을 가진다
 
-- Anatomy: icon, label, count-badge
-- Variants: folder, tag, all-notes
+- Anatomy: icon, label, count-badge, optional-menu-button
+- Variants: folder, tag, all-notes, unfiled
 - States: default, hover, focus-visible, active
 - Token references: color.body, color.weak-background, color.weak-foreground
 
@@ -296,6 +296,75 @@ Required.
 | error | not-applicable | 해당 컴포넌트는 검증 실패 상태를 갖지 않음 |
 | success | not-applicable | 해당 컴포넌트는 별도의 성공 상태를 표시하지 않음 |
 
+### Component: folder-menu
+
+**Semantics:** 사이드바 폴더 항목 뒤에 항상 보이는 메뉴 버튼과 그 버튼이 여는 popover 메뉴. "이름 바꾸기"와 "삭제"를 제공하며 삭제는 danger 텍스트로 구분한다. 메뉴 표면은 canvas 배경과 border 경계만 쓰고 그림자를 두지 않는다. 화살표 키로 항목을 이동하고 Esc나 바깥 클릭으로 닫히며 포커스는 메뉴 버튼으로 돌아간다
+
+- Anatomy: menu-button, menu-surface, menu-item
+- Variants: default, danger-item
+- States: default, hover, focus-visible, open
+- Token references: color.body, color.canvas, color.border, color.danger, radius.sm, radius.md
+
+- Interaction kind: interactive
+
+#### State applicability
+
+| State | Applicability | Reason |
+|---|---|---|
+| default | applicable |  |
+| hover | applicable |  |
+| focus-visible | applicable |  |
+| disabled | not-applicable | 폴더 메뉴는 항상 열 수 있으며 비활성 상태를 갖지 않음 |
+| loading | not-applicable | 노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음 |
+| error | not-applicable | 메뉴 자체는 검증 실패 상태를 갖지 않으며 실패는 이어지는 다이얼로그에서 표시함 |
+| success | not-applicable | 해당 컴포넌트는 별도의 성공 상태를 표시하지 않음 |
+
+### Component: folder-select
+
+**Semantics:** 에디터 상단에서 열린 노트의 폴더를 보여주고 바꾸는 네이티브 select. 라벨은 "폴더"이고 선택지는 "폴더 없음" 뒤에 가나다순 폴더가 온다. 바꾸면 노트를 즉시 옮기며 수정 시각은 바꾸지 않는다
+
+- Anatomy: label, select-control
+- Variants: default
+- States: default, hover, focus-visible
+- Token references: color.foreground, color.border, radius.md
+
+- Interaction kind: interactive
+
+#### State applicability
+
+| State | Applicability | Reason |
+|---|---|---|
+| default | applicable |  |
+| hover | applicable |  |
+| focus-visible | applicable |  |
+| disabled | not-applicable | 노트가 열려 있을 때만 보이며 항상 바꿀 수 있음 |
+| loading | not-applicable | 노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음 |
+| error | not-applicable | 저장 실패는 save-status-indicator가 표시함 |
+| success | not-applicable | 해당 컴포넌트는 별도의 성공 상태를 표시하지 않음 |
+
+### Component: text-field
+
+**Semantics:** 폴더 이름 입력 다이얼로그의 입력창. 보이는 라벨을 갖고, 규칙 위반 시 danger 테두리와 입력창 아래 danger 문구로 이유를 알리며 aria-invalid와 aria-describedby로 보조 기술에 연결한다. "취소"와 "만들기"/"저장" 행동이 있는 모달 다이얼로그 안에서 쓴다
+
+- Anatomy: label, input-text, error-message
+- Variants: box
+- States: default, hover, focus-visible, error
+- Token references: color.foreground, color.border, color.danger, radius.md
+
+- Interaction kind: interactive
+
+#### State applicability
+
+| State | Applicability | Reason |
+|---|---|---|
+| default | applicable |  |
+| hover | applicable |  |
+| focus-visible | applicable |  |
+| disabled | not-applicable | 다이얼로그가 열려 있는 동안 항상 입력할 수 있음 |
+| loading | not-applicable | 노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음 |
+| error | applicable |  |
+| success | not-applicable | 해당 컴포넌트는 별도의 성공 상태를 표시하지 않음 |
+
 ### Rules
 
 - 모든 interactive 컴포넌트는 default/hover/focus-visible을 반드시 구현한다
@@ -303,6 +372,8 @@ Required.
 - 노트 카드, 사이드바 항목, 태그 칩처럼 목록형 인터랙티브 요소는 카드 테두리나 그림자를 추가하지 않고 배경색 변화(surface → weak-background)로만 hover/selected를 표현한다
 
 - 저장 상태는 항상 아이콘과 문구를 함께 제공해 색만으로 의미를 전달하지 않는다
+
+- 입력 컴포넌트(search-input, text-field, folder-select)의 기본 테두리는 color.border를 유지한다. 캔버스 대비 1.23:1로 WCAG 1.4.11의 3:1에 못 미치지만, 모든 입력은 보이는 라벨 또는 앞쪽 아이콘과 placeholder로 식별되고 hover(color.muted, 3:1)와 focus-visible(primary 링)에서 3:1 이상의 경계를 가진다. 라벨·아이콘 없이 테두리만으로 식별되는 입력은 만들지 않는다
 
 <!-- design-md:section layout-platforms -->
 ## 5. Layout & Platforms

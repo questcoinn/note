@@ -1,0 +1,45 @@
+{
+  "approved": true,
+  "authority": {
+    "identifier": "iopell2007@gmail.com",
+    "role": "project-owner"
+  },
+  "checkpoint_receipt_sha256": "3c8715e1da34b22eb039df64e9e64739f644ae38e573888ffc33d418a7eec21f",
+  "destination": {
+    "design_md_sha256": "95ba02e3c6923eae7be80c65fce0ed388119640deb3b08021277a3d1b466cb0d",
+    "system_tree_sha256": "428c568ff95e86a7f1b1629ba423f30c05320899fae26931d0d2ffdb43caf8a2"
+  },
+  "kind": "design-md-core-project-adoption-report",
+  "previous": {
+    "design_md": {
+      "present": true,
+      "sha256": "bc964d16da70cfaea5c43d480725fac1ce38fe9f17c7db551312975cba56f324"
+    },
+    "system": {
+      "present": true,
+      "tree_sha256": "b85bd089608d6dc25246459eed4cb00cb813261a040c981eaee42cff7b1ab1bb"
+    }
+  },
+  "project_proof": {
+    "authority_mode": "core-v2-project-system",
+    "pass": true,
+    "profile": "portable-core",
+    "sha256": "4f72dd75c569de5d72c609cefabdddebbf5e47cdaf2b9a48f5e68639d24f3947"
+  },
+  "recovery": {
+    "action": null,
+    "recovered": false
+  },
+  "report_path": ".omd/adoptions/0477160a475e7286.json",
+  "schema_version": "2.0.0",
+  "source_package": {
+    "adoption_receipt_sha256": "11d360105f30c137fa466a8cae95cb4d81542b2036fd0b5787f41d2487b83753",
+    "coverage_sha256": "8bc772fcc212a2f15a3b2b5bf1e97e56a3186f60c7bd2b496f6fd2515d8f0833",
+    "design_md_sha256": "95ba02e3c6923eae7be80c65fce0ed388119640deb3b08021277a3d1b466cb0d",
+    "graph_sha256": "514d44fc0506e807e8401f20f27d7c78818a9935b9aaebabf36de80e8f1a649e",
+    "manifest_sha256": "af1e34b4884627e329ba642e7c6cd38fc0bb4cbb7d8879e6528000b4f4371ee4",
+    "provenance_sha256": "f91c347717a0770c6191ff448b2eb925f121bf90427591d451b9cb0fb6a6c92a"
+  },
+  "status": "adopted",
+  "transaction_id": "0477160a475e7286"
+}

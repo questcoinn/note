@@ -4,6 +4,7 @@
 
   let {
     variant = 'fill-primary',
+    type = 'button',
     icon,
     block = false,
     disabled = false,
@@ -11,6 +12,7 @@
     children,
   }: {
     variant?: 'fill-primary' | 'fill-danger'
+    type?: 'button' | 'submit'
     icon?: IconName
     block?: boolean
     disabled?: boolean
@@ -20,7 +22,7 @@
 </script>
 
 <button
-  type="button"
+  {type}
   class="primary-button {variant}"
   class:block
   {disabled}

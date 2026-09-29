@@ -2,13 +2,15 @@
 // 부팅 때 저장소에서 불러온 노트로 initNotes()가 채우고, 편집은 자동 저장 조율자를 거쳐 저장소에 기록된다.
 
 import { SvelteMap } from 'svelte/reactivity'
+import { folderById, removeFolderFromMemory, removeFolderRecord } from './folders.svelte'
 import { extractTitleAndSnippet, parse, renderHtml } from './markdown/render'
 import { AutosaveController, type SavePhase } from './persistence/autosave.svelte'
 import { SCHEMA_VERSION, type NoteRecord, type NoteStore } from './persistence/store'
 
 export class NoteDoc {
   readonly id: string
-  readonly folderId: string
+  // 저장본의 값 그대로다. 없는 폴더를 가리킬 수 있으므로 화면은 effectiveFolderId를 쓴다 (design.md D3)
+  folderId = $state('')
   readonly tagIds: string[]
 
   source = $state('')
@@ -22,6 +24,8 @@ export class NoteDoc {
   html = $derived(renderHtml(this.#tokens))
   title = $derived(this.#titleAndSnippet.title)
   snippet = $derived(this.#titleAndSnippet.snippet)
+  // '' 이면 "폴더 없음"
+  effectiveFolderId = $derived(folderById.has(this.folderId) ? this.folderId : '')
 
   constructor(record: NoteRecord, draft = false) {
     this.id = record.id
@@ -73,13 +77,13 @@ function newNoteId(): string {
   return crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
 }
 
-// 기록 전 새 노트를 만든다. 폴더·태그는 없다
-export function createNote(): string {
+// 기록 전 새 노트를 만든다. 태그는 없고, 폴더는 만든 범위의 폴더다('' 이면 폴더 없음)
+export function createNote(folderId: string): string {
   const note = new NoteDoc(
     {
       schema: SCHEMA_VERSION,
       id: newNoteId(),
-      folderId: '',
+      folderId,
       tagIds: [],
       source: '',
       updatedAt: new Date().toISOString(),
@@ -122,6 +126,38 @@ export async function deleteNote(id: string) {
   }
   removeNoteFromMemory(id)
 }
+
+// 노트의 폴더를 바꾸고 바로 저장한다. 내용을 고친 게 아니라서 수정 시각은 그대로 둔다 (design.md D4)
+export function moveNote(note: NoteDoc, folderId: string) {
+  if (note.effectiveFolderId === folderId) return
+  note.folderId = folderId
+  if (note.draft) return
+  autosave?.schedule(note.id)
+  autosave?.flush(note.id)
+}
+
+// 폴더 id -> 폴더 삭제 중 저장에 실패한 노트 id
+const unsavedMoves = new Map<string, Set<string>>()
+
+// 안의 노트를 모두 폴더 없음으로 옮겨 저장한 뒤 폴더를 지운다. 노트 저장이 하나라도 실패하면 폴더를 남기고 throw한다.
+// 이미 옮긴 노트는 되돌리지 않는다 (design.md D5)
+export async function deleteFolder(id: string) {
+  // 지난 시도에서 메모리로는 옮겼지만 저장하지 못한 노트도 다시 저장한다
+  const retry = unsavedMoves.get(id) ?? new Set<string>()
+  const targets = notes.filter((note) => note.folderId === id || retry.has(note.id))
+  for (const note of targets) note.folderId = ''
+  const saving = targets.filter((note) => !note.draft)
+  const results = await Promise.all(saving.map((note) => autosave?.saveNow(note.id) ?? Promise.resolve(false)))
+  const failed = saving.filter((_, index) => !results[index]).map((note) => note.id)
+  if (failed.length > 0) {
+    unsavedMoves.set(id, new Set(failed))
+    throw new Error('moving notes out of the folder failed')
+  }
+  unsavedMoves.delete(id)
+  await removeFolderRecord(id)
+  removeFolderFromMemory(id)
+}
+
 
 export function saveStatusOf(id: string): SavePhase {
   return autosave?.statusOf(id) ?? 'saved'

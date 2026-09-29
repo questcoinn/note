@@ -1,9 +1,12 @@
 // UI 표시 상태만 담는다. 노트 데이터 상태는 notes.svelte.ts에 있다.
 
-import { createNote, discardIfDraft, flushNotes, noteById } from './notes.svelte'
+import { folderById } from './folders.svelte'
+import { createNote, discardIfDraft, flushNotes, noteById, notes, type NoteDoc } from './notes.svelte'
 
 export type SaveStatus = 'saved' | 'saving' | 'unsaved'
 export type EditorTab = 'edit' | 'preview'
+// 가운데 노트 목록이 보여주는 범위. 사이드바에서 고른다
+export type Scope = { kind: 'all' } | { kind: 'unfiled' } | { kind: 'folder'; id: string }
 
 type Forced = {
   searchEmpty: boolean
@@ -24,6 +27,8 @@ function readForced(): Forced {
 export const forced: Readonly<Forced> = readForced()
 
 export const ui = $state({
+  // 새로고침하면 전체 노트로 시작한다
+  scope: { kind: 'all' } as Scope,
   selectedNoteId: null as string | null,
   // 선택된 노트의 목록 정렬 키. 선택한 순간의 수정 시각으로 고정해 편집하는 동안 카드가 움직이지 않게 한다
   pinnedSortKey: null as string | null,
@@ -45,10 +50,46 @@ export function selectNote(id: string | null) {
   ui.pinnedSortKey = id === null ? null : (noteById.get(id)?.updatedAt ?? null)
 }
 
+export function inScope(note: NoteDoc, scope: Scope): boolean {
+  if (scope.kind === 'all') return true
+  if (scope.kind === 'unfiled') return note.effectiveFolderId === ''
+  return note.effectiveFolderId === scope.id
+}
+
+export function isSameScope(a: Scope, b: Scope): boolean {
+  return a.kind === b.kind && (a.kind !== 'folder' || (b.kind === 'folder' && a.id === b.id))
+}
+
+export function scopeName(scope: Scope): string {
+  if (scope.kind === 'all') return '전체 노트'
+  if (scope.kind === 'unfiled') return '폴더 없음'
+  return folderById.get(scope.id)?.name ?? ''
+}
+
+export function scopedNotes(): NoteDoc[] {
+  return notes.filter((note) => inScope(note, ui.scope))
+}
+
+// 목록 빈 상태(노트 없음, 빈 폴더)가 "새 노트" 버튼을 보여주는지. 그때 에디터 빈 상태는 버튼을 뺀다
+export function listEmptyShowsNewNote(): boolean {
+  if (forced.searchEmpty || scopedNotes().length > 0) return false
+  return notes.length === 0 || ui.scope.kind === 'folder'
+}
+
+// 범위만 바꾼다. 열린 노트는 새 범위에 없어도 닫지 않으므로 selectNote()를 부르지 않는다 (design.md D2)
+export function selectScope(scope: Scope) {
+  ui.scope = scope
+}
+
+// 폴더 범위에서 만든 새 노트는 그 폴더에 들어간다
+function scopeFolderId(): string {
+  return ui.scope.kind === 'folder' ? ui.scope.id : ''
+}
+
 // 모든 "새 노트" 버튼이 부른다. 이미 기록 전 새 노트를 보고 있으면 더 만들지 않고 포커스만 옮긴다 (design.md D6)
 export function startNewNote() {
   const current = ui.selectedNoteId === null ? undefined : noteById.get(ui.selectedNoteId)
-  if (!current?.draft) selectNote(createNote())
+  if (!current?.draft) selectNote(createNote(scopeFolderId()))
   ui.editorTab = 'edit'
   // 오버레이의 close()와 달리 토글 버튼으로 포커스를 돌려주지 않는다. 포커스는 원문으로 간다
   ui.sidebarOpen = false

@@ -2,9 +2,17 @@
   import { tick } from 'svelte'
   import { deleteNote, flushNotes, markEdited, noteById, notes, saveStatusOf } from '../notes.svelte'
   import type { SavePhase } from '../persistence/autosave.svelte'
-  import { selectNote, startNewNote, ui, type EditorTab, type SaveStatus } from '../ui-state.svelte'
+  import {
+    listEmptyShowsNewNote,
+    selectNote,
+    startNewNote,
+    ui,
+    type EditorTab,
+    type SaveStatus,
+  } from '../ui-state.svelte'
   import ConfirmDialog from '../components/ConfirmDialog.svelte'
   import EmptyState from '../components/EmptyState.svelte'
+  import FolderSelect from '../components/FolderSelect.svelte'
   import Icon from '../components/Icon.svelte'
   import MarkdownToolbarButton from '../components/MarkdownToolbarButton.svelte'
   import PrimaryButton from '../components/PrimaryButton.svelte'
@@ -80,11 +88,11 @@
 <section class="editor-pane" aria-label="노트 편집">
   {#if !note}
     <div class="empty">
-      <!-- 노트가 하나도 없으면 목록 빈 상태가 "새 노트"를 보여주므로 여기서는 버튼을 빼 중복을 줄인다 -->
+      <!-- 목록 빈 상태(노트 없음, 빈 폴더)가 "새 노트"를 보여주면 여기서는 버튼을 빼 중복을 줄인다 -->
       <EmptyState
         icon="file-text"
         title="노트를 선택하거나 새로 만들어 보세요"
-        action={notes.length > 0 ? newNoteAction : undefined}
+        action={listEmptyShowsNewNote() ? undefined : newNoteAction}
       />
     </div>
   {:else}
@@ -92,6 +100,7 @@
       <button type="button" class="icon-button back" aria-label="목록으로" onclick={() => selectNote(null)}>
         <Icon name="arrow-left" />
       </button>
+      <FolderSelect {note} />
       <SaveStatusIndicator status={saveStatus} />
       <button type="button" class="icon-button delete" aria-label="노트 삭제" onclick={openDeleteDialog}>
         <Icon name="trash" />
@@ -164,8 +173,10 @@
     flex: 1;
   }
 
+  /* 좁은 폭에서는 폴더 선택 때문에 줄이 넘치면 다음 줄로 내린다 */
   .topbar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--spacing-md);
     padding: var(--spacing-md) var(--spacing-lg);
@@ -189,6 +200,11 @@
 
   .icon-button:hover {
     background: var(--color-surface);
+  }
+
+  /* 헤더가 줄바꿈되어도 삭제 버튼은 오른쪽 끝에 둔다 */
+  .delete {
+    margin-left: auto;
   }
 
   .delete:hover {

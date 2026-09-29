@@ -4,7 +4,7 @@
   --color-body: #4e5968;
   --color-border: #e5e8eb;
   --color-canvas: #ffffff;
-  --color-danger: #e42939;
+  --color-danger: #dc2535;
   --color-foreground: #191f28;
   --color-muted: #8b95a1;
   --color-on-primary: #ffffff;
@@ -114,6 +114,7 @@ pre {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
   color: inherit;

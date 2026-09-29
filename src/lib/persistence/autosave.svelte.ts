@@ -66,6 +66,22 @@ export class AutosaveController {
     }
   }
 
+  // 대기 없이 저장하고, 진행 중·후속 쓰기가 모두 끝날 때까지 기다린다 (폴더 삭제용).
+  // 마지막 쓰기가 실패했으면 false. 기다리는 동안 새 입력이 들어오면 그 입력은 평소처럼 대기 저장된다
+  async saveNow(id: string): Promise<boolean> {
+    const entry = this.#entry(id)
+    if (entry.writing) {
+      entry.dirtyDuringWrite = true
+      entry.flushAfterWrite = true
+    } else {
+      this.#phases.set(id, 'pending')
+      void this.#write(id, entry)
+    }
+    // 쓰기가 끝나면 #write가 먼저 깨어나 후속 쓰기를 동기로 시작하므로, inFlight가 비었을 때가 끝이다
+    while (entry.inFlight) await entry.inFlight
+    return this.statusOf(id) !== 'failed'
+  }
+
   // 대기 중인 저장을 버린다. 진행 중인 쓰기가 끝날 때까지 기다리고, 그 뒤 후속 저장은 하지 않는다 (노트 삭제용).
   // 기다려야 비동기 저장소에서 늦게 끝난 쓰기가 지운 레코드를 되살리지 않는다
   async cancel(id: string): Promise<void> {
