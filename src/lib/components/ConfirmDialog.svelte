@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from './Icon.svelte'
   import PrimaryButton from './PrimaryButton.svelte'
 
   let {
@@ -6,12 +7,15 @@
     title,
     description,
     confirmLabel,
+    error,
     onconfirm,
   }: {
     open?: boolean
     title: string
     description: string
     confirmLabel: string
+    // 확인한 동작이 실패했을 때 다이얼로그 안에 보여줄 문구
+    error?: string
     onconfirm: () => void
   } = $props()
 
@@ -28,6 +32,10 @@
 <dialog bind:this={dialog} class="confirm-dialog" aria-labelledby={titleId} onclose={() => (open = false)}>
   <h2 id={titleId} class="title">{title}</h2>
   <p class="description">{description}</p>
+  <!-- 영역은 늘 두고 내용만 바꿔야 스크린 리더가 새 문구를 알린다 -->
+  <div class="error" class:shown={error} role="alert">
+    {#if error}<Icon name="alert" /><span>{error}</span>{/if}
+  </div>
   <div class="actions">
     <button type="button" class="cancel" onclick={() => (open = false)}>취소</button>
     <PrimaryButton variant="fill-danger" onclick={onconfirm}>{confirmLabel}</PrimaryButton>
@@ -58,6 +66,19 @@
 
   .description {
     margin-top: var(--spacing-md);
+  }
+
+  .error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    color: var(--color-danger);
+    font-size: var(--type-body-small-size);
+    line-height: var(--type-body-small-line);
+  }
+
+  .error.shown {
+    margin-top: var(--spacing-lg);
   }
 
   .actions {

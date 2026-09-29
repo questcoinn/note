@@ -15,6 +15,8 @@ type Entry = {
   debounceTimer?: number
   maxWaitTimer?: number
   writing: boolean
+  // 진행 중인 쓰기. cancel이 이것을 기다린다
+  inFlight?: Promise<void>
   // 쓰는 도중 들어온 입력. 쓰기가 끝나면 한 번 더 저장한다
   dirtyDuringWrite: boolean
   // 쓰는 도중 flush 요청. 후속 저장을 기다리지 않고 바로 한다
@@ -64,14 +66,16 @@ export class AutosaveController {
     }
   }
 
-  // 대기 중인 저장을 버린다. 진행 중인 쓰기는 끝나도 후속 저장을 하지 않는다 (노트 삭제용)
-  cancel(id: string) {
+  // 대기 중인 저장을 버린다. 진행 중인 쓰기가 끝날 때까지 기다리고, 그 뒤 후속 저장은 하지 않는다 (노트 삭제용).
+  // 기다려야 비동기 저장소에서 늦게 끝난 쓰기가 지운 레코드를 되살리지 않는다
+  async cancel(id: string): Promise<void> {
     const entry = this.#entries.get(id)
     if (!entry) return
     this.#clearTimers(entry)
     entry.cancelled = true
     this.#entries.delete(id)
     this.#phases.delete(id)
+    await entry.inFlight
   }
 
   #entry(id: string): Entry {
@@ -106,12 +110,15 @@ export class AutosaveController {
     entry.writing = true
     this.#phases.set(id, 'writing')
     let failed = false
-    try {
-      // put은 여기서 동기로 호출된다. pagehide 중 flush가 저장소 호출까지 마치는 근거다
-      await this.#store.put(snapshot)
-    } catch {
-      failed = true
-    }
+    // put은 여기서 동기로 호출된다. pagehide 중 flush가 저장소 호출까지 마치는 근거다
+    entry.inFlight = this.#store.put(snapshot).then(
+      () => {},
+      () => {
+        failed = true
+      },
+    )
+    await entry.inFlight
+    entry.inFlight = undefined
     entry.writing = false
     if (entry.cancelled) return
 

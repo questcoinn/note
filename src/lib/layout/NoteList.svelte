@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { EMPTY_FOLDER_ID, folderById } from '../mock/data'
   import { notes, type NoteDoc } from '../notes.svelte'
-  import { FORCED_SEARCH_QUERY, forced, selectNote, ui } from '../ui-state.svelte'
+  import { FORCED_SEARCH_QUERY, forced, selectNote, startNewNote, ui } from '../ui-state.svelte'
   import EmptyState from '../components/EmptyState.svelte'
   import Icon from '../components/Icon.svelte'
   import NoteCard from '../components/NoteCard.svelte'
@@ -9,11 +8,6 @@
   import SearchInput from '../components/SearchInput.svelte'
 
   let query = $state(forced.searchEmpty ? FORCED_SEARCH_QUERY : '')
-
-  // 검색 강제 상태가 폴더 강제 상태보다 우선한다 (design.md D6)
-  const showFolderEmpty = forced.folderEmpty && !forced.searchEmpty
-  const emptyFolderName = folderById.get(EMPTY_FOLDER_ID)?.name ?? ''
-  const scopeTitle = showFolderEmpty ? emptyFolderName : '전체 노트'
 
   // 최근 수정 순. 선택된 노트만 선택한 순간의 수정 시각으로 정렬해, 편집하는 동안 제자리에 둔다 (design.md D6)
   const sortKey = (note: NoteDoc) =>
@@ -36,7 +30,8 @@
     >
       <Icon name="menu" />
     </button>
-    <h2 id="note-list-title" class="title">{scopeTitle}</h2>
+    <!-- 노트를 삭제한 뒤 포커스를 받는 자리 (design.md D5) -->
+    <h2 id="note-list-title" class="title" tabindex="-1">전체 노트</h2>
   </header>
 
   <SearchInput bind:value={query} />
@@ -47,14 +42,10 @@
       title="일치하는 노트가 없어요"
       description="검색어를 줄이거나 다른 단어로 찾아보세요."
     />
-  {:else if showFolderEmpty}
-    <EmptyState
-      icon="folder"
-      title="{emptyFolderName}에 노트를 모아 둘 수 있어요"
-      description="새 노트를 만들면 이 폴더에 바로 담겨요."
-    >
+  {:else if notes.length === 0}
+    <EmptyState icon="file-text" title="아직 노트가 없어요" description="떠오른 생각을 바로 적어 두세요.">
       {#snippet action()}
-        <PrimaryButton icon="plus">새 노트</PrimaryButton>
+        <PrimaryButton icon="plus" onclick={startNewNote}>새 노트</PrimaryButton>
       {/snippet}
     </EmptyState>
   {:else}

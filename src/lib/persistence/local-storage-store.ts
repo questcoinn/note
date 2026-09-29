@@ -1,6 +1,6 @@
 // localStorage 구현. 노트 하나를 키 하나에 저장한다 ("note:v1:<id>").
 
-import { isNoteRecord, type LoadResult, type NoteRecord, type NoteStore } from './store'
+import { isNoteRecord, type NoteRecord, type NoteStore } from './store'
 
 const KEY_PREFIX = 'note:v1:'
 
@@ -10,19 +10,17 @@ export class LocalStorageStore implements NoteStore {
     return window.localStorage
   }
 
-  async loadAll(): Promise<LoadResult> {
+  async loadAll(): Promise<NoteRecord[]> {
     const storage = this.#storage()
     const notes: NoteRecord[] = []
-    let hasAnyRecord = false
     for (let i = 0; i < storage.length; i++) {
       const key = storage.key(i)
       if (!key?.startsWith(KEY_PREFIX)) continue
-      hasAnyRecord = true
       const note = parseRecord(storage.getItem(key))
       // 키와 레코드의 id가 어긋난 것도 손상으로 보고 건너뛴다
       if (note && KEY_PREFIX + note.id === key) notes.push(note)
     }
-    return { notes, hasAnyRecord }
+    return notes
   }
 
   async put(note: NoteRecord): Promise<void> {

@@ -1,8 +1,6 @@
 <script lang="ts">
   import { clock, formatUpdatedLabel } from '../clock.svelte'
-  import { tagById } from '../mock/data'
   import type { NoteDoc } from '../notes.svelte'
-  import TagChip from './TagChip.svelte'
 
   let {
     note,
@@ -15,7 +13,7 @@
   } = $props()
 </script>
 
-<!-- 카드 안의 태그 칩도 버튼이라, 제목 버튼을 카드 전체로 늘리는 방식으로 중첩 버튼을 피한다 -->
+<!-- 제목 버튼을 카드 전체로 늘려 카드 어디를 눌러도 열린다. 카드 안에 다른 버튼(예: 태그 칩)이 생겨도 중첩 버튼이 되지 않는다 -->
 <article class="note-card" class:selected>
   <h3 class="title">
     <button type="button" class="hit" aria-current={selected ? 'true' : undefined} onclick={onselect}>
@@ -27,13 +25,6 @@
   {/if}
   <div class="meta">
     <span class="timestamp">{formatUpdatedLabel(note.updatedAt, clock.now)}</span>
-    {#if note.tagIds.length > 0}
-      <ul class="tags" aria-label="태그">
-        {#each note.tagIds as tagId (tagId)}
-          <li><TagChip label={tagById.get(tagId)?.name ?? tagId} /></li>
-        {/each}
-      </ul>
-    {/if}
   </div>
 </article>
 
@@ -107,21 +98,5 @@
     font-size: var(--type-body-small-size);
     line-height: var(--type-body-small-line);
     color: var(--color-muted);
-  }
-
-  .tags {
-    /* 늘린 제목 버튼 위로 올려 칩이 따로 눌리게 한다 */
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .selected :global(.tag-chip.weak) {
-    background: var(--color-canvas);
   }
 </style>

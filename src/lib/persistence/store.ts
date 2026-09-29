@@ -13,18 +13,12 @@ export type NoteRecord = {
   updatedAt: string
 }
 
-export type LoadResult = {
-  notes: NoteRecord[]
-  // 읽을 수 없는 레코드까지 포함해 노트 레코드가 하나라도 있는지. 첫 실행 판단에 쓴다
-  hasAnyRecord: boolean
-}
-
 // 모든 메서드는 비동기다. 동기 저장소(localStorage)도 같은 모양을 지켜야 비동기 저장소로 바꿀 때 호출부가 그대로다.
 // 주의: pagehide 안에서 시작한 비동기 작업은 끝난다는 보장이 없다. 지금 구현은 put을 호출하는 순간 동기로 쓰므로 괜찮지만,
 // 비동기 저장소로 바꾸면 visibilitychange(hidden) 시점의 저장을 주 계기로 삼아야 한다.
 export interface NoteStore {
   // 읽을 수 없거나 모르는 형식의 레코드는 건너뛰고, 지우거나 고치지 않는다
-  loadAll(): Promise<LoadResult>
+  loadAll(): Promise<NoteRecord[]>
   // 실패하면 reject한다 (용량 초과, 저장소 차단 등)
   put(note: NoteRecord): Promise<void>
   remove(id: string): Promise<void>

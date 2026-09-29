@@ -1,15 +1,11 @@
 <script lang="ts">
-  import { EMPTY_FOLDER_ID, folders, tags } from '../mock/data'
   import { notes } from '../notes.svelte'
-  import { forced, ui } from '../ui-state.svelte'
+  import { startNewNote, ui } from '../ui-state.svelte'
   import Icon from '../components/Icon.svelte'
   import PrimaryButton from '../components/PrimaryButton.svelte'
   import SidebarNavItem from '../components/SidebarNavItem.svelte'
 
   let closeButton: HTMLButtonElement | undefined = $state()
-
-  // 검색 강제 상태가 폴더 강제 상태보다 우선한다 (design.md D6)
-  const activeFolderId = $derived(forced.folderEmpty && !forced.searchEmpty ? EMPTY_FOLDER_ID : null)
 
   function close() {
     ui.sidebarOpen = false
@@ -34,7 +30,7 @@
   <div class="scrim" aria-hidden="true" onclick={close}></div>
 {/if}
 
-<nav id="sidebar" class="sidebar" class:open={ui.sidebarOpen} aria-label="폴더와 태그">
+<nav id="sidebar" class="sidebar" class:open={ui.sidebarOpen} aria-label="노트 탐색">
   <div class="top">
     <p class="app-name">노트</p>
     <button bind:this={closeButton} type="button" class="close" aria-label="메뉴 닫기" onclick={close}>
@@ -42,33 +38,13 @@
     </button>
   </div>
 
-  <PrimaryButton icon="plus" block>새 노트</PrimaryButton>
+  <PrimaryButton icon="plus" block onclick={startNewNote}>새 노트</PrimaryButton>
 
   <ul class="group">
     <li>
-      <SidebarNavItem variant="all-notes" label="전체 노트" count={notes.length} active={activeFolderId === null} />
+      <SidebarNavItem variant="all-notes" label="전체 노트" count={notes.length} active />
     </li>
   </ul>
-
-  <section>
-    <h2 class="group-title">폴더</h2>
-    <ul class="group">
-      {#each folders as folder (folder.id)}
-        <li>
-          <SidebarNavItem variant="folder" label={folder.name} count={folder.count} active={activeFolderId === folder.id} />
-        </li>
-      {/each}
-    </ul>
-  </section>
-
-  <section>
-    <h2 class="group-title">태그</h2>
-    <ul class="group">
-      {#each tags as tag (tag.id)}
-        <li><SidebarNavItem variant="tag" label={tag.name} count={tag.count} /></li>
-      {/each}
-    </ul>
-  </section>
 </nav>
 
 <style>
@@ -108,15 +84,6 @@
 
   .close:hover {
     background: var(--color-border);
-  }
-
-  .group-title {
-    margin-bottom: var(--spacing-md);
-    padding: 0 var(--spacing-md);
-    color: var(--color-foreground);
-    font-size: var(--type-h3-size);
-    font-weight: var(--type-h3-weight);
-    line-height: var(--type-h3-line);
   }
 
   .group {

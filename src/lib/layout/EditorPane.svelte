@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { flushNotes, markEdited, noteById, saveStatusOf } from '../notes.svelte'
+  import { tick } from 'svelte'
+  import { deleteNote, flushNotes, markEdited, noteById, notes, saveStatusOf } from '../notes.svelte'
   import type { SavePhase } from '../persistence/autosave.svelte'
-  import { selectNote, ui, type EditorTab, type SaveStatus } from '../ui-state.svelte'
+  import { selectNote, startNewNote, ui, type EditorTab, type SaveStatus } from '../ui-state.svelte'
   import ConfirmDialog from '../components/ConfirmDialog.svelte'
   import EmptyState from '../components/EmptyState.svelte'
   import Icon from '../components/Icon.svelte'
@@ -27,6 +28,34 @@
   ]
   const toolbar = ['bold', 'italic', 'heading', 'link', 'list', 'code'] as const
 
+  let source: HTMLTextAreaElement | undefined = $state()
+
+  // "새 노트"를 누를 때마다 원문으로 포커스한다. 좁은 화면에서 목록이 사라지고 원문이 그려진 뒤에 옮긴다
+  $effect(() => {
+    if (ui.focusSourceRequest === 0) return
+    void tick().then(() => source?.focus())
+  })
+
+  function openDeleteDialog() {
+    ui.deleteError = false
+    ui.deleteDialogOpen = true
+  }
+
+  // 성공하면 선택을 풀고 목록으로 포커스를 옮긴다. 실패하면 다이얼로그를 연 채 문구를 보인다 (design.md D5)
+  async function confirmDelete() {
+    if (!note) return
+    try {
+      await deleteNote(note.id)
+    } catch {
+      ui.deleteError = true
+      return
+    }
+    ui.deleteDialogOpen = false
+    selectNote(null)
+    await tick()
+    document.getElementById('note-list-title')?.focus()
+  }
+
   // Cmd/Ctrl+S는 노트 선택 여부와 관계없이 브라우저의 페이지 저장 대신 바로 저장한다
   function onkeydown(event: KeyboardEvent) {
     if ((event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 's') {
@@ -44,14 +73,19 @@
 <svelte:window {onkeydown} onpagehide={() => flushNotes()} />
 <svelte:document {onvisibilitychange} />
 
+{#snippet newNoteAction()}
+  <PrimaryButton icon="plus" onclick={startNewNote}>새 노트</PrimaryButton>
+{/snippet}
+
 <section class="editor-pane" aria-label="노트 편집">
   {#if !note}
     <div class="empty">
-      <EmptyState icon="file-text" title="노트를 선택하거나 새로 만들어 보세요">
-        {#snippet action()}
-          <PrimaryButton icon="plus">새 노트</PrimaryButton>
-        {/snippet}
-      </EmptyState>
+      <!-- 노트가 하나도 없으면 목록 빈 상태가 "새 노트"를 보여주므로 여기서는 버튼을 빼 중복을 줄인다 -->
+      <EmptyState
+        icon="file-text"
+        title="노트를 선택하거나 새로 만들어 보세요"
+        action={notes.length > 0 ? newNoteAction : undefined}
+      />
     </div>
   {:else}
     <header class="topbar">
@@ -59,7 +93,7 @@
         <Icon name="arrow-left" />
       </button>
       <SaveStatusIndicator status={saveStatus} />
-      <button type="button" class="icon-button delete" aria-label="노트 삭제" onclick={() => (ui.deleteDialogOpen = true)}>
+      <button type="button" class="icon-button delete" aria-label="노트 삭제" onclick={openDeleteDialog}>
         <Icon name="trash" />
       </button>
     </header>
@@ -91,6 +125,7 @@
         <label class="visually-hidden" for="{tabId}-source">마크다운 원문</label>
         <textarea
           id="{tabId}-source"
+          bind:this={source}
           class="source"
           spellcheck="false"
           bind:value={note.source}
@@ -107,8 +142,9 @@
       bind:open={ui.deleteDialogOpen}
       title="‘{note.title}’ 노트가 영구히 삭제돼요"
       description="삭제한 노트는 되돌릴 수 없어요."
-      confirmLabel="삭제"
-      onconfirm={() => (ui.deleteDialogOpen = false)}
+      confirmLabel={ui.deleteError ? '다시 삭제' : '삭제'}
+      error={ui.deleteError ? '노트를 삭제하지 못했어요. 다시 시도해 주세요.' : undefined}
+      onconfirm={confirmDelete}
     />
   {/if}
 </section>
