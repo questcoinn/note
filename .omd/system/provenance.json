@@ -678,9 +678,140 @@
       "path": "experience.primary_tasks.2",
       "source_class": "prompt-fact",
       "value": "폴더로 노트를 분류하고, 태그로 관련 노트 사이를 오가기"
+    },
+    {
+      "evidence": [
+        ".omd/preferences.md#pref_muxjcbgn_ac4f1db9"
+      ],
+      "path": "components_states.components.1",
+      "source_class": "prompt-fact",
+      "value": {
+        "anatomy": [
+          "title",
+          "preview-snippet",
+          "search-excerpt",
+          "highlight",
+          "timestamp",
+          "tag-chips"
+        ],
+        "id": "note-card",
+        "interaction": {
+          "kind": "interactive",
+          "state_applicability": {
+            "default": {
+              "applicability": "applicable"
+            },
+            "disabled": {
+              "applicability": "not-applicable",
+              "reason": "노트 카드는 비활성 상태를 갖지 않음"
+            },
+            "error": {
+              "applicability": "not-applicable",
+              "reason": "해당 컴포넌트는 검증 실패 상태를 갖지 않음"
+            },
+            "focus-visible": {
+              "applicability": "applicable"
+            },
+            "hover": {
+              "applicability": "applicable"
+            },
+            "loading": {
+              "applicability": "not-applicable",
+              "reason": "노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음"
+            },
+            "success": {
+              "applicability": "not-applicable",
+              "reason": "해당 컴포넌트는 별도의 성공 상태를 표시하지 않음"
+            }
+          }
+        },
+        "semantics": "노트 목록의 개별 항목. 클릭하면 해당 노트 상세로 이동하는 인터랙티브 표면. 검색어가 있는 동안 제목의 일치 부분을 하이라이트하고, 스니펫 자리에 본문에서 처음 일치한 줄의 발췌를 보여준다. 발췌는 첫 일치 앞을 최대 24자만 남기고 잘랐으면 …로 시작하며, 뒤는 기존 두 줄 제한에 맡기고, 발췌 안의 모든 검색 단어를 하이라이트한다. 본문에 일치가 없으면 원래 스니펫을 하이라이트 없이 쓴다. 하이라이트는 weak-background 배경과 weak-foreground 글자의 mark이고, selected 카드 안에서는 하이라이트 배경을 canvas로 바꾼다",
+        "states": [
+          "default",
+          "hover",
+          "focus-visible",
+          "selected"
+        ],
+        "token_refs": [
+          "color.surface",
+          "color.foreground",
+          "color.body",
+          "color.muted",
+          "color.weak-background",
+          "color.weak-foreground",
+          "color.canvas",
+          "radius.card",
+          "radius.sm"
+        ],
+        "variants": [
+          "default",
+          "selected"
+        ]
+      }
+    },
+    {
+      "evidence": [
+        ".omd/preferences.md#pref_muxjcbho_31e7fe38"
+      ],
+      "path": "components_states.components.4",
+      "source_class": "prompt-fact",
+      "value": {
+        "anatomy": [
+          "leading-icon",
+          "input-text",
+          "clear-button"
+        ],
+        "id": "search-input",
+        "interaction": {
+          "kind": "interactive",
+          "state_applicability": {
+            "default": {
+              "applicability": "applicable"
+            },
+            "disabled": {
+              "applicability": "not-applicable",
+              "reason": "검색 입력은 항상 사용 가능하며 비활성 상태를 갖지 않음"
+            },
+            "error": {
+              "applicability": "not-applicable",
+              "reason": "검색은 유효성 실패가 없고 결과 없음은 별도 empty-state로 표현됨"
+            },
+            "focus-visible": {
+              "applicability": "applicable"
+            },
+            "hover": {
+              "applicability": "applicable"
+            },
+            "loading": {
+              "applicability": "not-applicable",
+              "reason": "노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음"
+            },
+            "success": {
+              "applicability": "not-applicable",
+              "reason": "해당 컴포넌트는 별도의 성공 상태를 표시하지 않음"
+            }
+          }
+        },
+        "semantics": "TDS Mobile text-field의 box 변형을 웹 검색 입력에 적용. 지금 범위의 노트 목록을 필터링한다. 포커스 상태에서 Esc는 검색어를 지우고(입력기 조합 중 Esc는 무시) Cmd/Ctrl+K는 입력에 포커스하고 값을 전체 선택한다. 결과 없음 상태는 \"일치하는 노트가 없어요\"로 명시하고, 범위가 전체 노트가 아니며 다른 곳에 일치하는 노트가 있으면 \"다른 곳에 일치하는 노트가 N개 있어요.\" 설명과 \"전체 노트에서 보기\" primary-button을 함께 보여준다. 그 밖에는 \"검색어를 줄이거나 다른 단어로 찾아보세요.\"이고 버튼이 없다. 범위 이름은 문구에 넣지 않는다",
+        "states": [
+          "default",
+          "hover",
+          "focus-visible",
+          "filled",
+          "no-results"
+        ],
+        "token_refs": [
+          "color.border",
+          "color.muted",
+          "radius.md"
+        ],
+        "variants": [
+          "box"
+        ]
+      }
     }
   ],
-  "design_md_sha256": "6ad30037dc092ea09a209e4c3f0503c47c5aa2146c77fc5831e6e7ff66e18e2e",
-  "graph_sha256": "0505d1789494e78509616f448cc780b0ea971b1fb7e8ed4d4c0f330fcf0e46a7",
+  "design_md_sha256": "c8a47b2d9cf2edd9a51cd6f5684e0dc0f8f5e7849845f408b7b6a8946d52d74b",
+  "graph_sha256": "2600905ca45480414269a4a2be8ebbd2b9a07968ad2febe326793dad729eeb26",
   "schema_version": "2.0.0"
 }

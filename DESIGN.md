@@ -171,12 +171,12 @@ Required.
 
 ### Component: note-card
 
-**Semantics:** 노트 목록의 개별 항목. 클릭하면 해당 노트 상세로 이동하는 인터랙티브 표면
+**Semantics:** 노트 목록의 개별 항목. 클릭하면 해당 노트 상세로 이동하는 인터랙티브 표면. 검색어가 있는 동안 제목의 일치 부분을 하이라이트하고, 스니펫 자리에 본문에서 처음 일치한 줄의 발췌를 보여준다. 발췌는 첫 일치 앞을 최대 24자만 남기고 잘랐으면 …로 시작하며, 뒤는 기존 두 줄 제한에 맡기고, 발췌 안의 모든 검색 단어를 하이라이트한다. 본문에 일치가 없으면 원래 스니펫을 하이라이트 없이 쓴다. 하이라이트는 weak-background 배경과 weak-foreground 글자의 mark이고, selected 카드 안에서는 하이라이트 배경을 canvas로 바꾼다
 
-- Anatomy: title, preview-snippet, timestamp, tag-chips
+- Anatomy: title, preview-snippet, search-excerpt, highlight, timestamp, tag-chips
 - Variants: default, selected
 - States: default, hover, focus-visible, selected
-- Token references: color.surface, color.foreground, color.body, color.muted, radius.card
+- Token references: color.surface, color.foreground, color.body, color.muted, color.weak-background, color.weak-foreground, color.canvas, radius.card, radius.sm
 
 - Interaction kind: interactive
 
@@ -240,7 +240,7 @@ Required.
 
 ### Component: search-input
 
-**Semantics:** TDS Mobile text-field의 box 변형을 웹 검색 입력에 적용. 결과 없음 상태는 문구로 명시
+**Semantics:** TDS Mobile text-field의 box 변형을 웹 검색 입력에 적용. 지금 범위의 노트 목록을 필터링한다. 포커스 상태에서 Esc는 검색어를 지우고(입력기 조합 중 Esc는 무시) Cmd/Ctrl+K는 입력에 포커스하고 값을 전체 선택한다. 결과 없음 상태는 "일치하는 노트가 없어요"로 명시하고, 범위가 전체 노트가 아니며 다른 곳에 일치하는 노트가 있으면 "다른 곳에 일치하는 노트가 N개 있어요." 설명과 "전체 노트에서 보기" primary-button을 함께 보여준다. 그 밖에는 "검색어를 줄이거나 다른 단어로 찾아보세요."이고 버튼이 없다. 범위 이름은 문구에 넣지 않는다
 
 - Anatomy: leading-icon, input-text, clear-button
 - Variants: box

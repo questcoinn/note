@@ -67,7 +67,8 @@ export function renderHtml(tokens: Token[]): string {
 
 // 제목·미리보기 문장 파생 (design.md D7)
 
-type Block = { kind: 'heading' | 'text' | 'code'; tag: string; lines: string[] }
+// cell은 표 셀이다. 검색에만 쓰고 제목·미리보기 문장 규칙에는 넣지 않는다 (add-note-search design.md D1)
+type Block = { kind: 'heading' | 'text' | 'code' | 'cell'; tag: string; lines: string[] }
 
 // inline 토큰을 서식 기호 없는 줄 배열로 만든다. 줄바꿈에서 끊고 빈 줄은 버린다
 function inlineLines(inline: Token): string[] {
@@ -98,6 +99,9 @@ function collectBlocks(tokens: Token[]): Block[] {
     } else if (token.type === 'fence' || token.type === 'code_block') {
       const lines = token.content.split('\n').map((line) => line.trim()).filter(Boolean)
       if (lines.length > 0) blocks.push({ kind: 'code', tag: token.tag, lines })
+    } else if (token.type === 'th_open' || token.type === 'td_open') {
+      const lines = inlineLines(tokens[i + 1])
+      if (lines.length > 0) blocks.push({ kind: 'cell', tag: token.tag, lines })
     }
   })
   return blocks
@@ -109,7 +113,13 @@ type TitleSource = { block: Block; line: number | null } | null
 function findTitle(blocks: Block[]): TitleSource {
   const h1 = blocks.find((block) => block.kind === 'heading' && block.tag === 'h1')
   if (h1) return { block: h1, line: null }
-  return blocks.length > 0 ? { block: blocks[0], line: 0 } : null
+  const first = blocks.find((block) => block.kind !== 'cell')
+  return first ? { block: first, line: 0 } : null
+}
+
+function titleText(source: TitleSource): string | null {
+  if (!source) return null
+  return source.line === null ? source.block.lines.join(' ') : source.block.lines[source.line]
 }
 
 export type Derived = { title: string; snippet: string }
@@ -117,7 +127,7 @@ export type Derived = { title: string; snippet: string }
 export function extractTitleAndSnippet(tokens: Token[]): Derived {
   const blocks = collectBlocks(tokens)
   const source = findTitle(blocks)
-  const title = !source ? '제목 없음' : source.line === null ? source.block.lines.join(' ') : source.block.lines[source.line]
+  const title = titleText(source) ?? '제목 없음'
 
   let snippet = ''
   for (const block of blocks) {
@@ -129,4 +139,19 @@ export function extractTitleAndSnippet(tokens: Token[]): Derived {
     }
   }
   return { title, snippet }
+}
+
+// 검색 대상 텍스트. 미리보기에 보이는 글자에서 제목과 나머지 줄을 나눈다.
+// 대체 제목("제목 없음")은 내용이 아니라서 title이 ''다 (add-note-search design.md D1)
+export type SearchText = { title: string; body: string[] }
+
+export function extractSearchText(tokens: Token[]): SearchText {
+  const blocks = collectBlocks(tokens)
+  const source = findTitle(blocks)
+  const body: string[] = []
+  for (const block of blocks) {
+    if (block !== source?.block) body.push(...block.lines)
+    else if (source.line !== null) body.push(...block.lines.filter((_, i) => i !== source.line))
+  }
+  return { title: titleText(source) ?? '', body }
 }

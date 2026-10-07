@@ -3,9 +3,10 @@
 
 import { SvelteMap } from 'svelte/reactivity'
 import { folderById, removeFolderFromMemory, removeFolderRecord } from './folders.svelte'
-import { extractTitleAndSnippet, parse, renderHtml } from './markdown/render'
+import { extractSearchText, extractTitleAndSnippet, parse, renderHtml } from './markdown/render'
 import { AutosaveController, type SavePhase } from './persistence/autosave.svelte'
 import { SCHEMA_VERSION, type NoteRecord, type NoteStore } from './persistence/store'
+import { fold } from './search'
 import { normalizeTagInput, tagKey } from './tags'
 
 export class NoteDoc {
@@ -26,6 +27,9 @@ export class NoteDoc {
   html = $derived(renderHtml(this.#tokens))
   title = $derived(this.#titleAndSnippet.title)
   snippet = $derived(this.#titleAndSnippet.snippet)
+  // 검색 대상 텍스트와 그 비교용 문자열. 검색할 때 처음 계산한다 (add-note-search design.md D1, D2)
+  searchText = $derived(extractSearchText(this.#tokens))
+  searchKey = $derived(fold([this.searchText.title, ...this.searchText.body].join('\n')))
   // '' 이면 "폴더 없음"
   effectiveFolderId = $derived(folderById.has(this.folderId) ? this.folderId : '')
 

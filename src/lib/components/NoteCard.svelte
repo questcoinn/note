@@ -1,6 +1,7 @@
 <script lang="ts">
   import { clock, formatUpdatedLabel } from '../clock.svelte'
   import type { NoteDoc } from '../notes.svelte'
+  import { excerpt, highlight, type Segment } from '../search'
   import { tagKey } from '../tags'
   import TagChip from './TagChip.svelte'
 
@@ -10,6 +11,7 @@
     onselect,
     currentTagKey,
     onselecttag,
+    terms = [],
   }: {
     note: NoteDoc
     selected?: boolean
@@ -17,17 +19,28 @@
     // 지금 보고 있는 태그 범위의 키. 그 칩은 selected로 보이고 눌러도 아무것도 하지 않는다
     currentTagKey?: string
     onselecttag: (name: string) => void
+    // 검색 단어. 비어 있으면 검색하지 않을 때의 카드다
+    terms?: string[]
   } = $props()
+
+  // 대체 제목("제목 없음")은 내용이 아니라서 하이라이트하지 않는다 (add-note-search design.md D4)
+  const titleSegments = $derived(terms.length > 0 && note.searchText.title ? highlight(note.title, terms) : null)
+  // 본문에 일치가 없으면 null이고 원래 스니펫을 쓴다
+  const excerptSegments = $derived(terms.length > 0 ? excerpt(note.searchText.body, terms) : null)
 </script>
+
+{#snippet marked(segments: Segment[])}{#each segments as segment, i (i)}{#if segment.mark}<mark>{segment.text}</mark>{:else}{segment.text}{/if}{/each}{/snippet}
 
 <!-- 제목 버튼을 카드 전체로 늘려 카드 어디를 눌러도 열린다. 카드 안에 다른 버튼(예: 태그 칩)이 생겨도 중첩 버튼이 되지 않는다 -->
 <article class="note-card" class:selected>
   <h3 class="title">
     <button type="button" class="hit" aria-current={selected ? 'true' : undefined} onclick={onselect}>
-      {note.title}
+      {#if titleSegments}{@render marked(titleSegments)}{:else}{note.title}{/if}
     </button>
   </h3>
-  {#if note.snippet}
+  {#if excerptSegments}
+    <p class="snippet">{@render marked(excerptSegments)}</p>
+  {:else if note.snippet}
     <p class="snippet">{note.snippet}</p>
   {/if}
   <div class="meta">
@@ -137,6 +150,18 @@
 
   .selected :global(.tag-chip.weak:not(.selected):hover) {
     background: var(--color-weak-background);
+  }
+
+  /* 검색 일치 하이라이트. 글자 사이에 끼므로 여백 없이 배경 면으로만 구분한다 */
+  mark {
+    border-radius: var(--radius-sm);
+    background: var(--color-weak-background);
+    color: var(--color-weak-foreground);
+  }
+
+  /* selected 카드의 배경과 하이라이트 배경이 같아 canvas로 띄운다 */
+  .selected mark {
+    background: var(--color-canvas);
   }
 
   .timestamp {

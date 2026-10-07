@@ -4,19 +4,24 @@
   let { value = $bindable('') }: { value?: string } = $props()
 
   let input: HTMLInputElement
-  const inputId = $props.id()
 
   function clear() {
     value = ''
     input.focus()
   }
+
+  // Esc는 검색어를 지운다. 입력기 조합 중 Esc는 조합 취소로만 쓴다 (add-note-search design.md D7)
+  function onkeydown(event: KeyboardEvent) {
+    if (event.key !== 'Escape' || event.isComposing || !value) return
+    event.preventDefault()
+    value = ''
+  }
 </script>
 
-<!-- 뼈대 단계: 입력값은 보이지만 목록을 필터링하지 않는다 -->
 <div class="search-input" role="search">
-  <label class="visually-hidden" for={inputId}>노트 검색</label>
+  <label class="visually-hidden" for="note-search-input">노트 검색</label>
   <span class="leading"><Icon name="search" /></span>
-  <input bind:this={input} bind:value id={inputId} type="search" placeholder="노트 검색" autocomplete="off" />
+  <input bind:this={input} bind:value id="note-search-input" type="search" placeholder="노트 검색" autocomplete="off" {onkeydown} />
   {#if value}
     <button type="button" class="clear" aria-label="검색어 지우기" onclick={clear}>
       <Icon name="x" size={18} />

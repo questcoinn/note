@@ -191,3 +191,37 @@ source_context: "openspec/changes/add-note-tags/design.md#D8"
 ```
 
 Layout wording: the three columns are sidebar (all notes, unfiled, folders) · note list · editor+preview, not "sidebar (folders/tags)"; the h3 role usage becomes "note card title, sidebar folder group header"; the primary task "태그와 폴더로 노트 분류 및 탐색" becomes folders for classification and tags for jumping between related notes
+
+## 2026-10-07T03:15:51.502Z — note-card-gains-search-match-display-while
+
+```omd-meta
+id: pref_muxjcbgn_ac4f1db9
+timestamp: 2026-10-07T03:15:51.502Z
+scope: components.card
+signal: user-statement
+confidence: explicit
+status: applied
+applied_at: 2026-10-07T03:18:51.251Z
+applied_design_md_hash: c8a47b2d9cf2edd9a51cd6f5684e0dc0f8f5e7849845f408b7b6a8946d52d74b
+source_agent: claude-code
+source_context: "openspec/changes/add-note-search/design.md#D4"
+```
+
+note-card gains search-match display: while a search query is present, matched parts of the title are highlighted, and the snippet slot shows an excerpt of the first body line containing a search term (at most 24 characters before the first match, starting with … when cut; the end is left to the existing two-line clamp) with every search term inside it highlighted; highlights are <mark> using color.weak-background with color.weak-foreground text and radius.sm, and inside a selected card the highlight background becomes color.canvas; when the body has no match the regular snippet is shown without highlight; anatomy adds search-excerpt and highlight
+
+## 2026-10-07T03:15:51.502Z — search-input-filters-the-current-scope-esc
+
+```omd-meta
+id: pref_muxjcbho_31e7fe38
+timestamp: 2026-10-07T03:15:51.502Z
+scope: components.input
+signal: user-statement
+confidence: explicit
+status: applied
+applied_at: 2026-10-07T03:18:51.251Z
+applied_design_md_hash: c8a47b2d9cf2edd9a51cd6f5684e0dc0f8f5e7849845f408b7b6a8946d52d74b
+source_agent: claude-code
+source_context: "openspec/changes/add-note-search/design.md#D5"
+```
+
+search-input now filters the current scope's note list; Esc while focused clears the query (ignored during IME composition) and Cmd/Ctrl+K focuses it and selects its value; the no-results state reads "일치하는 노트가 없어요" and, when the scope is not all notes and other notes match, explains "다른 곳에 일치하는 노트가 N개 있어요." with a "전체 노트에서 보기" primary-button, otherwise "검색어를 줄이거나 다른 단어로 찾아보세요." with no button; the scope name is never put in the copy
