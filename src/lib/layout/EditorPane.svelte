@@ -1,6 +1,8 @@
 <script lang="ts">
   import { tick } from 'svelte'
   import { deleteNote, flushNotes, markEdited, noteById, notes, saveStatusOf } from '../notes.svelte'
+  import { applyEdit } from '../markdown/apply-edit'
+  import { format, toEdit, type FormatVariant } from '../markdown/format'
   import type { SavePhase } from '../persistence/autosave.svelte'
   import {
     listEmptyShowsNewNote,
@@ -35,9 +37,46 @@
     { id: 'edit', label: '편집' },
     { id: 'preview', label: '미리보기' },
   ]
-  const toolbar = ['bold', 'italic', 'heading', 'link', 'list', 'code'] as const
+  const toolbar: FormatVariant[] = ['bold', 'italic', 'heading', 'link', 'list', 'code']
 
   let source: HTMLTextAreaElement | undefined = $state()
+  let toolbarElement: HTMLDivElement | undefined = $state()
+  // Tab 순서에 들어가는 서식 도구 버튼 하나 (design.md D5)
+  let activeTool = $state(0)
+
+  // 원문 영역의 마지막 선택 영역에 서식을 적용한다. 원문 반영과 저장은 input 이벤트 경로를 탄다 (design.md D2, D3)
+  function applyFormat(variant: FormatVariant) {
+    if (!source) return
+    const result = format(variant, source.value, source.selectionStart, source.selectionEnd)
+    applyEdit(source, toEdit(source.value, result))
+  }
+
+  function ontoolbarkeydown(event: KeyboardEvent) {
+    const last = toolbar.length - 1
+    const targets: Record<string, number> = {
+      ArrowRight: activeTool === last ? 0 : activeTool + 1,
+      ArrowLeft: activeTool === 0 ? last : activeTool - 1,
+      Home: 0,
+      End: last,
+    }
+    const next = targets[event.key]
+    if (next === undefined) return
+    event.preventDefault()
+    activeTool = next
+    toolbarElement?.querySelectorAll('button')[next]?.focus()
+  }
+
+  // 한국어 자판에서는 key가 'ㅠ', 'ㅑ'로 오므로 영문자가 아니면 물리 키(code)로 다시 본다 (design.md D4)
+  const shortcuts: Record<string, FormatVariant> = { b: 'bold', i: 'italic', KeyB: 'bold', KeyI: 'italic' }
+
+  function onsourcekeydown(event: KeyboardEvent) {
+    if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey || event.isComposing) return
+    const key = event.key.toLowerCase()
+    const variant = /^[a-z]$/.test(key) ? shortcuts[key] : shortcuts[event.code]
+    if (!variant) return
+    event.preventDefault()
+    applyFormat(variant)
+  }
 
   // "새 노트"를 누를 때마다 원문으로 포커스한다. 좁은 화면에서 목록이 사라지고 원문이 그려진 뒤에 옮긴다
   $effect(() => {
@@ -113,9 +152,22 @@
       <TagInput {note} />
     {/key}
 
-    <div class="toolbar" role="toolbar" aria-label="서식">
-      {#each toolbar as variant (variant)}
-        <MarkdownToolbarButton {variant} />
+    <div
+      bind:this={toolbarElement}
+      class="toolbar"
+      role="toolbar"
+      aria-label="서식"
+      tabindex="-1"
+      data-tab={ui.editorTab}
+      onkeydown={ontoolbarkeydown}
+    >
+      {#each toolbar as variant, i (variant)}
+        <MarkdownToolbarButton
+          {variant}
+          tabindex={i === activeTool ? 0 : -1}
+          onclick={() => applyFormat(variant)}
+          onfocus={() => (activeTool = i)}
+        />
       {/each}
     </div>
 
@@ -145,6 +197,7 @@
           spellcheck="false"
           bind:value={note.source}
           oninput={() => note && markEdited(note)}
+          onkeydown={onsourcekeydown}
         ></textarea>
       </div>
       <!-- note.html은 사용자 입력에서 만들어지지만 markdown/render.ts에서 DOMPurify로 정화된 값이다. 정화를 거치지 않은 HTML을 여기에 넣지 말 것 -->
@@ -472,6 +525,11 @@
 
     .panes[data-tab='edit'] .preview,
     .panes[data-tab='preview'] .source-pane {
+      display: none;
+    }
+
+    /* 원문이 보이지 않는 미리보기 탭에서는 서식 도구도 숨긴다 (add-markdown-formatting design.md D6) */
+    .toolbar[data-tab='preview'] {
       display: none;
     }
   }

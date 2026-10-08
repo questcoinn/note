@@ -225,3 +225,37 @@ source_context: "openspec/changes/add-note-search/design.md#D5"
 ```
 
 search-input now filters the current scope's note list; Esc while focused clears the query (ignored during IME composition) and Cmd/Ctrl+K focuses it and selects its value; the no-results state reads "일치하는 노트가 없어요" and, when the scope is not all notes and other notes match, explains "다른 곳에 일치하는 노트가 N개 있어요." with a "전체 노트에서 보기" primary-button, otherwise "검색어를 줄이거나 다른 단어로 찾아보세요." with no button; the scope name is never put in the copy
+
+## 2026-10-07T06:58:19.284Z — markdown-toolbar-button-toggles-markdown-on
+
+```omd-meta
+id: pref_muxraeqc_175e43e5
+timestamp: 2026-10-07T06:58:19.284Z
+scope: components.button
+signal: user-statement
+confidence: explicit
+status: applied
+applied_at: 2026-10-07T07:12:17.000Z
+applied_design_md_hash: ba1d7c8e5141c608c40441197df6ecf371cfa9f38916d19610619e9c754bb605
+source_agent: claude-code
+source_context: "openspec/changes/add-markdown-formatting/design.md#D3"
+```
+
+markdown-toolbar-button toggles markdown on the source selection and returns focus to the source with the result selected; "active" is only the pressed-while-clicking state and there is no cursor-context pressed state (no aria-pressed); the toolbar uses roving tabindex (one Tab stop, Left/Right arrows wrap, Home/End); Cmd/Ctrl+B applies bold and Cmd/Ctrl+I italic inside the markdown source, and link has no shortcut because Cmd/Ctrl+K is search
+
+## 2026-10-07T06:58:19.284Z — layout-hide-formatting-toolbar-on-preview-tab
+
+```omd-meta
+id: pref_muxraeqd_4f643e2b
+timestamp: 2026-10-07T06:58:19.284Z
+scope: layout
+signal: user-statement
+confidence: explicit
+status: applied
+applied_at: 2026-10-07T07:12:17.000Z
+applied_design_md_hash: ba1d7c8e5141c608c40441197df6ecf371cfa9f38916d19610619e9c754bb605
+source_agent: claude-code
+source_context: "openspec/changes/add-markdown-formatting/design.md#D6"
+```
+
+Below 1024px, while the preview tab is selected the formatting toolbar is hidden; it shows on the edit tab and always at 1024px and wider

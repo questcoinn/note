@@ -809,9 +809,80 @@
           "box"
         ]
       }
+    },
+    {
+      "evidence": [
+        ".omd/preferences.md#pref_muxraeqc_175e43e5"
+      ],
+      "path": "components_states.components.6",
+      "source_class": "prompt-fact",
+      "value": {
+        "anatomy": [
+          "icon"
+        ],
+        "id": "markdown-toolbar-button",
+        "interaction": {
+          "kind": "interactive",
+          "state_applicability": {
+            "default": {
+              "applicability": "applicable"
+            },
+            "disabled": {
+              "applicability": "not-applicable",
+              "reason": "서식 도구는 항상 사용 가능하며 비활성 상태를 갖지 않음"
+            },
+            "error": {
+              "applicability": "not-applicable",
+              "reason": "해당 컴포넌트는 검증 실패 상태를 갖지 않음"
+            },
+            "focus-visible": {
+              "applicability": "applicable"
+            },
+            "hover": {
+              "applicability": "applicable"
+            },
+            "loading": {
+              "applicability": "not-applicable",
+              "reason": "노트 앱의 로컬 저장/렌더링 동작은 즉시 완료되어 로딩 대기 상태가 없음"
+            },
+            "success": {
+              "applicability": "not-applicable",
+              "reason": "해당 컴포넌트는 별도의 성공 상태를 표시하지 않음"
+            }
+          }
+        },
+        "semantics": "에디터 상단 서식 도구. 누르면 원문의 선택 영역에 마크다운 서식을 넣거나 빼고, 포커스를 원문으로 돌려 결과를 선택해 둔다. active는 누르는 동안의 상태이며 커서 자리의 서식에 따른 눌린 상태(aria-pressed)는 두지 않는다. 툴바는 roving tabindex로 Tab 순서에서 한 자리만 차지하고, 좌우 화살표(양 끝에서 반대쪽으로 넘어감)와 Home/End로 버튼 사이를 옮긴다. 원문에서 Cmd/Ctrl+B는 굵게, Cmd/Ctrl+I는 기울임을 적용하며, Cmd/Ctrl+K는 검색이 쓰므로 링크 단축키는 없다",
+        "states": [
+          "default",
+          "hover",
+          "focus-visible",
+          "active"
+        ],
+        "token_refs": [
+          "color.body",
+          "color.weak-background",
+          "radius.sm"
+        ],
+        "variants": [
+          "bold",
+          "italic",
+          "heading",
+          "link",
+          "list",
+          "code"
+        ]
+      }
+    },
+    {
+      "evidence": [
+        ".omd/preferences.md#pref_muxraeqd_4f643e2b"
+      ],
+      "path": "layout_platforms.rules.4",
+      "source_class": "prompt-fact",
+      "value": "1024px 미만에서 미리보기 탭이 선택된 동안에는 서식 도구를 숨기고, 편집 탭과 1024px 이상에서는 보인다"
     }
   ],
-  "design_md_sha256": "c8a47b2d9cf2edd9a51cd6f5684e0dc0f8f5e7849845f408b7b6a8946d52d74b",
-  "graph_sha256": "2600905ca45480414269a4a2be8ebbd2b9a07968ad2febe326793dad729eeb26",
+  "design_md_sha256": "ba1d7c8e5141c608c40441197df6ecf371cfa9f38916d19610619e9c754bb605",
+  "graph_sha256": "92b65652458d660ee1a59ffa657a86777fbe10de51f82876237dddd550556c42",
   "schema_version": "2.0.0"
 }

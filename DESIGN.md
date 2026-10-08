@@ -275,7 +275,7 @@ Required.
 
 ### Component: markdown-toolbar-button
 
-**Semantics:** 에디터 상단 서식 도구. 누르면 현재 선택 영역에 마크다운 서식을 토글
+**Semantics:** 에디터 상단 서식 도구. 누르면 원문의 선택 영역에 마크다운 서식을 넣거나 빼고, 포커스를 원문으로 돌려 결과를 선택해 둔다. active는 누르는 동안의 상태이며 커서 자리의 서식에 따른 눌린 상태(aria-pressed)는 두지 않는다. 툴바는 roving tabindex로 Tab 순서에서 한 자리만 차지하고, 좌우 화살표(양 끝에서 반대쪽으로 넘어감)와 Home/End로 버튼 사이를 옮긴다. 원문에서 Cmd/Ctrl+B는 굵게, Cmd/Ctrl+I는 기울임을 적용하며, Cmd/Ctrl+K는 검색이 쓰므로 링크 단축키는 없다
 
 - Anatomy: icon
 - Variants: bold, italic, heading, link, list, code
@@ -415,6 +415,8 @@ Required.
 - 에디터와 프리뷰는 기본적으로 좌우 대등 2단이며, 좁은 화면에서는 탭 전환으로 대체한다
 
 - 사이드바는 좁은 화면에서 오버레이로 전환하고 본문 위에 그림자 없이 불투명 배경으로 얹는다
+
+- 1024px 미만에서 미리보기 탭이 선택된 동안에는 서식 도구를 숨기고, 편집 탭과 1024px 이상에서는 보인다
 
 ### Platform: web
 

@@ -1,11 +1,15 @@
 <script lang="ts">
+  import type { FormatVariant } from '../markdown/format'
   import Icon, { type IconName } from './Icon.svelte'
 
-  type Variant = 'bold' | 'italic' | 'heading' | 'link' | 'list' | 'code'
+  let {
+    variant,
+    tabindex,
+    onclick,
+    onfocus,
+  }: { variant: FormatVariant; tabindex: 0 | -1; onclick: () => void; onfocus: () => void } = $props()
 
-  let { variant }: { variant: Variant } = $props()
-
-  const meta: Record<Variant, { icon: IconName; label: string }> = {
+  const meta: Record<FormatVariant, { icon: IconName; label: string }> = {
     bold: { icon: 'bold', label: '굵게' },
     italic: { icon: 'italic', label: '기울임' },
     heading: { icon: 'heading', label: '제목' },
@@ -15,8 +19,17 @@
   }
 </script>
 
-<!-- 뼈대 단계: 누르면 선택 영역에 서식을 토글할 자리. 지금은 원문을 바꾸지 않는다. -->
-<button type="button" class="toolbar-button" aria-label={meta[variant].label} title={meta[variant].label}>
+<!-- 마우스로 누를 때 포커스를 가져가지 않아 원문의 선택 영역과 스크롤이 그대로다 (add-markdown-formatting design.md D3) -->
+<button
+  type="button"
+  class="toolbar-button"
+  aria-label={meta[variant].label}
+  title={meta[variant].label}
+  {tabindex}
+  onmousedown={(event) => event.preventDefault()}
+  {onclick}
+  {onfocus}
+>
   <Icon name={meta[variant].icon} size={18} />
 </button>
 
