@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { tick } from 'svelte'
+  import { tick, untrack } from 'svelte'
   import { deleteNote, flushNotes, markEdited, noteById, notes, saveStatusOf } from '../notes.svelte'
   import { applyEdit } from '../markdown/apply-edit'
   import { format, toEdit, type FormatVariant } from '../markdown/format'
   import type { SavePhase } from '../persistence/autosave.svelte'
+  import { ScrollSync } from '../scroll-sync/scroll-sync'
   import {
     listEmptyShowsNewNote,
     selectNote,
@@ -41,6 +42,8 @@
 
   let source: HTMLTextAreaElement | undefined = $state()
   let toolbarElement: HTMLDivElement | undefined = $state()
+  let previewElement: HTMLDivElement | undefined = $state()
+  let scrollSync: ScrollSync | undefined
   // Tab 순서에 들어가는 서식 도구 버튼 하나 (design.md D5)
   let activeTool = $state(0)
 
@@ -76,6 +79,35 @@
     if (!variant) return
     event.preventDefault()
     applyFormat(variant)
+  }
+
+  // 원문과 미리보기 스크롤 동기화 (add-scroll-sync design.md D8)
+  $effect(() => {
+    if (!source || !previewElement) return
+    const sync = new ScrollSync(source, previewElement)
+    scrollSync = sync
+    return () => {
+      sync.destroy()
+      scrollSync = undefined
+    }
+  })
+
+  // 다른 노트를 열면 두 영역 모두 맨 위에서 시작한다
+  $effect(() => {
+    void note?.id
+    untrack(() => scrollSync?.reset())
+  })
+
+  // 미리보기가 다시 그려진 뒤 상대 쪽을 다시 맞춘다
+  $effect(() => {
+    void note?.html
+    untrack(() => scrollSync?.contentChanged())
+  })
+
+  // 탭을 바꾸기 전에 보던 위치를 잡아 둔다. 새로 보이는 쪽은 ScrollSync가 크기 변화로 알아채 그 위치로 옮긴다
+  function selectTab(tab: EditorTab) {
+    if (tab !== ui.editorTab) scrollSync?.capture()
+    ui.editorTab = tab
   }
 
   // "새 노트"를 누를 때마다 원문으로 포커스한다. 좁은 화면에서 목록이 사라지고 원문이 그려진 뒤에 옮긴다
@@ -180,7 +212,7 @@
           class="tab"
           aria-selected={ui.editorTab === tab.id}
           aria-controls="{tabId}-{tab.id}"
-          onclick={() => (ui.editorTab = tab.id)}
+          onclick={() => selectTab(tab.id)}
         >
           {tab.label}
         </button>
@@ -201,7 +233,13 @@
         ></textarea>
       </div>
       <!-- note.html은 사용자 입력에서 만들어지지만 markdown/render.ts에서 DOMPurify로 정화된 값이다. 정화를 거치지 않은 HTML을 여기에 넣지 말 것 -->
-      <div id="{tabId}-preview" class="pane preview" role="tabpanel" aria-labelledby="{tabId}-preview-tab">
+      <div
+        id="{tabId}-preview"
+        bind:this={previewElement}
+        class="pane preview"
+        role="tabpanel"
+        aria-labelledby="{tabId}-preview-tab"
+      >
         {@html note.html}
       </div>
     </div>
@@ -348,6 +386,8 @@
     padding: var(--spacing-xl);
     color: var(--color-body);
     overflow-wrap: anywhere;
+    /* 다시 그릴 때 위치는 스크롤 동기화가 맞춘다. 브라우저 앵커링이 먼저 움직여 한 프레임 튀는 것을 막는다 */
+    overflow-anchor: none;
   }
 
   .preview :global(* + *) {

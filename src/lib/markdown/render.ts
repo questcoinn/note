@@ -45,6 +45,27 @@ function taskList(state: StateCore) {
 
 md.core.ruler.after('inline', 'task-list', taskList)
 
+// 스크롤 동기화 앵커. 블록이 시작하는 원문 줄(0부터)을 미리보기 요소에 남긴다 (add-scroll-sync design.md D2)
+// 표는 <table>, fence는 <code>, 들여쓴 코드는 <pre>에 붙는다. 모두 블록의 위쪽 끝과 거의 같다
+const ANCHOR_TYPES = new Set([
+  'paragraph_open',
+  'heading_open',
+  'list_item_open',
+  'blockquote_open',
+  'table_open',
+  'fence',
+  'code_block',
+  'hr',
+])
+
+function sourceLines(state: StateCore) {
+  for (const token of state.tokens) {
+    if (token.map && ANCHOR_TYPES.has(token.type)) token.attrSet('data-source-line', String(token.map[0]))
+  }
+}
+
+md.core.ruler.push('source-line', sourceLines)
+
 // 링크는 새 탭에서 열고 새 탭이 앱 창에 접근하지 못하게 한다.
 // DOMPurify는 기본 설정에서 target을 지우므로 정화가 끝난 뒤 붙인다.
 // 전역 훅이다: 다른 정화 용도가 생기면 DOMPurify(window)로 별도 인스턴스를 만들 것
@@ -61,7 +82,8 @@ export function parse(source: string): Token[] {
 
 export function renderHtml(tokens: Token[]): string {
   const html = md.renderer.render(tokens, md.options, {})
-  // img 금지는 이미지 렌더러가 바뀌어도 외부 요청이 생기지 않게 하는 이중 방어
+  // img 금지는 이미지 렌더러가 바뀌어도 외부 요청이 생기지 않게 하는 이중 방어.
+  // 스크롤 동기화가 data-source-line에 기댄다. ALLOW_DATA_ATTR을 끄면 동기화가 비율 매핑으로 떨어진다
   return DOMPurify.sanitize(html, { FORBID_TAGS: ['img', 'style', 'form'], FORBID_ATTR: ['style'] })
 }
 
